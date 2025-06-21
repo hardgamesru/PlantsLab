@@ -1,9 +1,7 @@
 from fastapi import FastAPI
-from .routers import scooters
-from .database import Base, engine
+from .routers import simulator
 
-app = FastAPI(title="Scooter Share API")
+app = FastAPI(title="Scooter Simulation API")
 
-Base.metadata.create_all(bind=engine)  # Автосоздание таблиц
-
-app.include_router(scooters.router, prefix="/api", tags=["scooters", "stations"])
+# Подключаем маршруты
+app.include_router(simulator.router, prefix="/api")
