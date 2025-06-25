@@ -9,9 +9,20 @@ class Lab:
         self.greenhouses = {}
         self.time_manager = TimeManager()
         self.log = []
+        # Создаем 10 пустых теплиц
+        for i in range(10):
+            self.add_greenhouse(i)
 
-    def add_greenhouse(self, id: int, plant_type: str):
-        self.greenhouses[id] = Greenhouse(id, plant_type)
+    def add_greenhouse(self, id: int):
+        self.greenhouses[id] = Greenhouse(id)
+
+    def set_plant(self, gh_id: int, plant_type: str):
+        if gh_id in self.greenhouses:
+            self.greenhouses[gh_id].set_plant(plant_type)
+
+    def remove_plant(self, gh_id: int):
+        if gh_id in self.greenhouses:
+            self.greenhouses[gh_id].remove_plant()
 
     def update(self):
         elapsed = self.time_manager.update()
@@ -27,7 +38,7 @@ class Lab:
                         'stage': plant.stage.value,
                         'size': plant.size,
                         'health': plant.health
-                    }
+                    } if plant is not None else None
                 ))
 
     def step(self):
@@ -59,8 +70,8 @@ class Lab:
                         'stage': gh.plant.stage.value,
                         'size': gh.plant.size,
                         'health': gh.plant.health,
-                        'flowering_percent': gh.plant.flowering_percent  # Добавляем процент цветения
-                    }
+                        'flowering_percent': gh.plant.flowering_percent
+                    } if gh.plant else None  # Обработка пустой теплицы
                 } for gh in self.greenhouses.values()
             ]
         }

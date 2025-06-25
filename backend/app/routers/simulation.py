@@ -5,11 +5,6 @@ import json
 router = APIRouter()
 lab = Lab()
 
-# Инициализация 10 теплиц
-for i in range(10):
-    plant_type = "gerbera" if i < 5 else "larch"
-    lab.add_greenhouse(i, plant_type)
-
 
 @router.get("/state")
 async def get_state():
@@ -54,7 +49,36 @@ async def reset_system():
     global lab
     lab = Lab()
     # Инициализация 10 теплиц
-    for i in range(10):
-        plant_type = "gerbera" if i < 5 else "larch"
-        lab.add_greenhouse(i, plant_type)
     return {"status": "system reset"}
+
+
+@router.post("/greenhouse/{gh_id}/plant/{plant_type}")
+async def set_plant(gh_id: int, plant_type: str):
+    if gh_id not in lab.greenhouses:
+        raise HTTPException(status_code=404, detail="Greenhouse not found")
+    if plant_type not in ["gerbera", "larch"]:
+        raise HTTPException(status_code=400, detail="Invalid plant type")
+
+    lab.set_plant(gh_id, plant_type)
+    return {"status": "plant added"}
+
+
+@router.delete("/greenhouse/{gh_id}/plant")
+async def remove_plant(gh_id: int):
+    if gh_id not in lab.greenhouses:
+        raise HTTPException(status_code=404, detail="Greenhouse not found")
+
+    lab.remove_plant(gh_id)
+    return {"status": "plant removed"}
+
+
+@router.post("/reset")
+async def reset_system():
+    global lab
+    lab = Lab()  # При перезапуске создаем новую лабораторию с пустыми теплицами
+    # Возвращаем кнопку паузы в исходное состояние
+    lab.time_manager.paused = True
+    return {
+        "status": "system reset",
+        "paused": True
+    }

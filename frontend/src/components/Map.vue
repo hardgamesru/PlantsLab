@@ -4,77 +4,81 @@
       class="greenhouse"
       v-for="gh in greenhouses"
       :key="gh.id"
-      :class="{ 'dead-plant': gh.plant.health <= 0 }"
+      :class="{ 'empty-greenhouse': !gh.plant }"
     >
-      <div class="info">
+      <div v-if="!gh.plant" class="empty-state">
         <h3>Теплица {{ gh.id }}</h3>
-        <p>{{ gh.plant.name }}</p>
-        <p>Стадия: {{ gh.plant.stage }}</p>
-        <p v-if="gh.plant.flowering_percent > 0">Цветение: {{ gh.plant.flowering_percent.toFixed(1) }}%</p>
-        <p :class="{
-          'health-good': gh.plant.health > 70,
-          'health-warning': gh.plant.health > 30 && gh.plant.health <= 70,
-          'health-critical': gh.plant.health > 0 && gh.plant.health <= 30,
-          'health-dead': gh.plant.health <= 0
-        }">
-          Здоровье: {{ gh.plant.health > 0 ? gh.plant.health.toFixed(1) + '%' : 'мертво' }}
-        </p>
-      </div>
-
-      <!-- Визуализация растения -->
-      <div class="plant-visualization">
-        <div
-          class="plant"
-          :style="{
-            width: (gh.plant.size * 20) + 'px',
-            height: (gh.plant.size * 20) + 'px',
-            backgroundColor: getPlantColor(gh.plant),
-            opacity: gh.plant.health > 0 ? 1 : 0.5
-          }"
-        ></div>
-
-        <!-- Индикатор цветения -->
-        <div v-if="gh.plant.flowering_percent > 0" class="flower-indicator">
-          <div class="flower-progress" :style="{ width: gh.plant.flowering_percent + '%' }"></div>
+        <p>Растение не посажено</p>
+        <div class="plant-options">
+          <button @click="$emit('set-plant', gh.id, 'gerbera')">Посадить Герберу</button>
+          <button @click="$emit('set-plant', gh.id, 'larch')">Посадить Лиственницу</button>
         </div>
       </div>
 
-      <!-- Управление условиями -->
-      <div class="conditions-controls">
-        <div class="control-group">
-          <label>Температура: {{ gh.conditions.temperature }}°C</label>
-          <input
-            type="range"
-            min="0"
-            max="50"
-            step="1"
-            v-model.number="gh.conditions.temperature"
-            @change="updateGhConditions(gh.id)"
-          >
+      <div v-else>
+        <div class="info">
+          <div class="header-row">
+            <h3>Теплица {{ gh.id }}</h3>
+            <button class="remove-btn" @click="$emit('remove-plant', gh.id)">✕</button>
+          </div>
+          <p>{{ gh.plant.name }}</p>
+          <p>Стадия: {{ gh.plant.stage }}</p>
+          <p v-if="gh.plant.flowering_percent > 0">Цветение: {{ gh.plant.flowering_percent.toFixed(1) }}%</p>
+          <p :class="healthClass(gh.plant)">
+            Здоровье: {{ gh.plant.health > 0 ? gh.plant.health.toFixed(1) + '%' : 'мертво' }}
+          </p>
         </div>
 
-        <div class="control-group">
-          <label>Влажность: {{ gh.conditions.humidity }}%</label>
-          <input
-            type="range"
-            min="0"
-            max="100"
-            step="1"
-            v-model.number="gh.conditions.humidity"
-            @change="updateGhConditions(gh.id)"
-          >
+        <!-- Визуализация растения -->
+        <div class="plant-visualization">
+          <div
+            class="plant"
+            :style="plantStyle(gh.plant)"
+          ></div>
+
+          <!-- Индикатор цветения -->
+          <div v-if="gh.plant.flowering_percent > 0" class="flower-indicator">
+            <div class="flower-progress" :style="{ width: gh.plant.flowering_percent + '%' }"></div>
+          </div>
         </div>
 
-        <div class="control-group">
-          <label>Свет: {{ gh.conditions.light }}%</label>
-          <input
-            type="range"
-            min="0"
-            max="100"
-            step="1"
-            v-model.number="gh.conditions.light"
-            @change="updateGhConditions(gh.id)"
-          >
+        <!-- Управление условиями -->
+        <div class="conditions-controls">
+          <div class="control-group">
+            <label>Температура: {{ gh.conditions.temperature }}°C</label>
+            <input
+              type="range"
+              min="0"
+              max="50"
+              step="1"
+              v-model.number="gh.conditions.temperature"
+              @change="updateGhConditions(gh.id)"
+            >
+          </div>
+
+          <div class="control-group">
+            <label>Влажность: {{ gh.conditions.humidity }}%</label>
+            <input
+              type="range"
+              min="0"
+              max="100"
+              step="1"
+              v-model.number="gh.conditions.humidity"
+              @change="updateGhConditions(gh.id)"
+            >
+          </div>
+
+          <div class="control-group">
+            <label>Свет: {{ gh.conditions.light }}%</label>
+            <input
+              type="range"
+              min="0"
+              max="100"
+              step="1"
+              v-model.number="gh.conditions.light"
+              @change="updateGhConditions(gh.id)"
+            >
+          </div>
         </div>
       </div>
     </div>
@@ -86,7 +90,7 @@ import { ref, watch } from 'vue'
 
 export default {
   props: ['greenhouses'],
-  emits: ['update-conditions'],
+  emits: ['update-conditions', 'set-plant', 'remove-plant'],
   setup(props, { emit }) {
     const localGreenhouses = ref(JSON.parse(JSON.stringify(props.greenhouses)))
 
@@ -96,13 +100,30 @@ export default {
 
     const updateGhConditions = (ghId) => {
       const gh = localGreenhouses.value.find(g => g.id === ghId)
-      if (gh) {
+      if (gh && gh.plant) {  // Только если есть растение
         emit('update-conditions', ghId, {
           temperature: gh.conditions.temperature,
           humidity: gh.conditions.humidity,
           light: gh.conditions.light
         })
       }
+    }
+
+    const healthClass = (plant) => {
+      if (plant.health <= 0) return 'health-dead';
+      if (plant.health > 70) return 'health-good';
+      if (plant.health > 30) return 'health-warning';
+      return 'health-critical';
+    }
+
+    const plantStyle = (plant) => {
+      const size = plant.size * 20;
+      return {
+        width: `${size}px`,
+        height: `${size}px`,
+        backgroundColor: getPlantColor(plant),
+        opacity: plant.health > 0 ? 1 : 0.5
+      };
     }
 
     const getPlantColor = (plant) => {
@@ -114,6 +135,8 @@ export default {
     return {
       localGreenhouses,
       updateGhConditions,
+      healthClass,
+      plantStyle,
       getPlantColor
     }
   }
@@ -121,6 +144,63 @@ export default {
 </script>
 
 <style>
+/* Стили для пустой теплицы */
+.empty-greenhouse {
+  background-color: #f0f8ff;
+  border: 2px dashed #a0c5e8;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: 20px;
+  text-align: center;
+}
+
+.plant-options {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 15px;
+  width: 100%;
+}
+
+.plant-options button {
+  padding: 8px 12px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.plant-options button:hover {
+  background-color: #3e8e41;
+}
+
+/* Стили для кнопки удаления */
+.header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.remove-btn {
+  background: none;
+  border: none;
+  font-size: 1.2em;
+  cursor: pointer;
+  color: #ff5555;
+  padding: 5px;
+}
+
+.remove-btn:hover {
+  color: #ff0000;
+}
 .map-row {
   display: flex;
   flex-wrap: nowrap;

@@ -65,6 +65,20 @@ export default {
     const paused = ref(true)
     const timeScale = ref(1.0)
 
+     const setPlant = async (ghId, plantType) => {
+      await fetch(`http://localhost:8000/api/greenhouse/${ghId}/plant/${plantType}`, {
+        method: 'POST'
+      })
+      await fetchState()
+    }
+
+    const removePlant = async (ghId) => {
+      await fetch(`http://localhost:8000/api/greenhouse/${ghId}/plant`, {
+        method: 'DELETE'
+      })
+      await fetchState()
+    }
+
     const fetchState = async () => {
       try {
         const response = await fetch('http://localhost:8000/api/state')
@@ -126,7 +140,9 @@ export default {
       resetSystem,
       updateTimeScale,
       updateConditions,
-      formatTime
+      formatTime,
+      setPlant,
+      removePlant
     }
   }
 }
