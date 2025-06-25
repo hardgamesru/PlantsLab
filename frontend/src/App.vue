@@ -24,7 +24,7 @@
 
       <div class="simulation-controls">
         <button @click="resetSystem">Перезапустить систему</button>
-        <button @click="togglePause">{{ paused ? 'Старт' : 'Пауза' }}</button>
+        <button @click="togglePause">{{ paused ? 'Пауза' : 'Старт' }}</button>
         <button @click="step">Шаг</button>
         <div class="time-control">
           <label>Скорость времени:</label>
@@ -39,10 +39,16 @@
     <!-- Два ряда теплиц -->
     <div class="greenhouse-rows">
       <div class="greenhouse-row">
-        <Map :greenhouses="state.greenhouses.slice(0, 5)" @update-conditions="updateConditions"/>
+        <Map :greenhouses="state.greenhouses.slice(0, 5)"
+             @update-conditions="updateConditions"
+             @set-plant="setPlant"
+             @remove-plant="removePlant"/>
       </div>
       <div class="greenhouse-row">
-        <Map :greenhouses="state.greenhouses.slice(5, 10)" @update-conditions="updateConditions"/>
+        <Map :greenhouses="state.greenhouses.slice(5, 10)"
+             @update-conditions="updateConditions"
+             @set-plant="setPlant"
+             @remove-plant="removePlant"/>
       </div>
     </div>
   </div>
@@ -79,7 +85,10 @@ export default {
     }
 
     const resetSystem = async () => {
-      await fetch('http://localhost:8000/api/reset', { method: 'POST' })
+      const response = await fetch('http://localhost:8000/api/reset', { method: 'POST' })
+      const data = await response.json()
+      // Синхронизируем состояние паузы
+      paused.value = data.paused
       await fetchState()
     }
 
