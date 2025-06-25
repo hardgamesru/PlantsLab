@@ -1,7 +1,18 @@
 from fastapi import FastAPI
-from .routers import simulator
+from fastapi.middleware.cors import CORSMiddleware
+from .routers import simulation
 
-app = FastAPI(title="Scooter Simulation API")
+app = FastAPI()
 
-# Подключаем маршруты
-app.include_router(simulator.router, prefix="/api")
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+app.include_router(simulation.router, prefix="/api")
+
+@app.get("/")
+def read_root():
+    return {"message": "Plant Simulation API"}

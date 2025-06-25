@@ -1,84 +1,232 @@
 <template>
-  <main class="p-4 max-w-4xl mx-auto">
-    <h1 class="text-3xl font-bold mb-6">🚦 Симуляция самокатов</h1>
+  <div id="app">
+    <h1>Лаборатория растений</h1>
 
-    <div class="space-x-3 mb-6">
-      <button
-        @click="start"
-        :disabled="running"
-        class="bg-green-600 hover:bg-green-700 text-white px-5 py-2 rounded"
-      >Старт</button>
+    <!-- Инструкция и оптимальные значения -->
+    <div class="instructions">
+      <div class="optimal-values">
+        <h2>Инструкция по выращиванию</h2>
+        <div class="plant-instruction">
+          <h3>Гербера</h3>
+          <p>Оптимальная температура: 22±10°C</p>
+          <p>Оптимальная влажность: 60±20%</p>
+          <p>Оптимальное освещение: 70±30%</p>
+          <p>Растение цветет при температуре ≥22°C</p>
+        </div>
+        <div class="plant-instruction">
+          <h3>Лиственница</h3>
+          <p>Оптимальная температура: 18±10°C</p>
+          <p>Оптимальная влажность: 50±20%</p>
+          <p>Оптимальное освещение: 60±30%</p>
+          <p>Требуется стратификация (t < 5°C)</p>
+        </div>
+      </div>
 
-      <button
-        @click="pause"
-        :disabled="!running"
-        class="bg-yellow-600 hover:bg-yellow-700 text-white px-5 py-2 rounded"
-      >Пауза</button>
-
-      <button
-        @click="resume"
-        :disabled="running"
-        class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded"
-      >Продолжить</button>
+      <div class="simulation-controls">
+        <button @click="resetSystem">Перезапустить систему</button>
+        <button @click="togglePause">{{ paused ? 'Старт' : 'Пауза' }}</button>
+        <button @click="step">Шаг</button>
+        <div class="time-control">
+          <label>Скорость времени:</label>
+          <input type="range" min="0.1" max="10" step="0.1" v-model="timeScale" @change="updateTimeScale">
+          <span>{{ timeScale }}x</span>
+        </div>
+      </div>
     </div>
 
-    <div class="mb-6 text-lg space-y-1">
-      <p>Самокатов: {{ state?.scooters?.length || 0 }}</p>
-      <p>Людей: {{ state?.people?.length || 0 }}</p>
-      <p>Сломанных: {{ brokenScooters }}</p>
-      <p>Завершённых поездок: {{ finishedTrips }}</p>
-    </div>
+    <p class="virtual-time">Виртуальное время: {{ formatTime(state.virtual_time) }}</p>
 
-    <MapCanvas :state="state" />
-  </main>
+    <!-- Два ряда теплиц -->
+    <div class="greenhouse-rows">
+      <div class="greenhouse-row">
+        <Map :greenhouses="state.greenhouses.slice(0, 5)" @update-conditions="updateConditions"/>
+      </div>
+      <div class="greenhouse-row">
+        <Map :greenhouses="state.greenhouses.slice(5, 10)" @update-conditions="updateConditions"/>
+      </div>
+    </div>
+  </div>
 </template>
 
-<script setup>
-import { ref, computed } from 'vue'
-import MapCanvas from './components/MapCanvas.vue'
+<script>
+import Map from './components/Map.vue'
+import { ref, onMounted } from 'vue'
 
-const state = ref(null)
-const running = ref(false)
-let ticker = null
+export default {
+  components: { Map },
+  setup() {
+    const state = ref({ greenhouses: [], virtual_time: 0 })
+    const paused = ref(true)
+    const timeScale = ref(1.0)
 
-async function loadState() {
-  const res = await fetch('/api/state')
-  state.value = await res.json()
+    const fetchState = async () => {
+      try {
+        const response = await fetch('http://localhost:8000/api/state')
+        state.value = await response.json()
+      } catch (error) {
+        console.error('Ошибка получения данных:', error)
+      }
+    }
+
+    const togglePause = async () => {
+      await fetch('http://localhost:8000/api/pause', { method: 'POST' })
+      paused.value = !paused.value
+    }
+
+    const step = async () => {
+      await fetch('http://localhost:8000/api/step', { method: 'POST' })
+      await fetchState()
+    }
+
+    const resetSystem = async () => {
+      await fetch('http://localhost:8000/api/reset', { method: 'POST' })
+      await fetchState()
+    }
+
+    const updateTimeScale = async () => {
+      await fetch(`http://localhost:8000/api/time_scale/${timeScale.value}`, { method: 'POST' })
+    }
+
+    const updateConditions = async (ghId, newConditions) => {
+      await fetch(`http://localhost:8000/api/greenhouse/${ghId}/conditions`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newConditions)
+      })
+      await fetchState()
+    }
+
+    const formatTime = (seconds) => {
+      const days = Math.floor(seconds / 86400)
+      const hours = Math.floor((seconds % 86400) / 3600)
+      const mins = Math.floor((seconds % 3600) / 60)
+      const secs = Math.floor(seconds % 60)
+      return `${days}д ${hours}ч ${mins}м ${secs}с`
+    }
+
+    onMounted(() => {
+      setInterval(fetchState, 1000)
+    })
+
+    return {
+      state,
+      paused,
+      timeScale,
+      togglePause,
+      step,
+      resetSystem,
+      updateTimeScale,
+      updateConditions,
+      formatTime
+    }
+  }
 }
-
-async function start() {
-  await fetch('/api/start?people=10&scooters_per_station=3', { method: 'POST' })
-  running.value = true
-  await loadState()
-  ticker = setInterval(() => tick(), 100)  // тик каждые 100 мс для плавности
-}
-
-function pause() {
-  running.value = false
-  clearInterval(ticker)
-}
-
-function resume() {
-  running.value = true
-  ticker = setInterval(() => tick(), 100)
-}
-
-async function tick() {
-  const res = await fetch('/api/tick')
-  state.value = await res.json()
-}
-
-const brokenScooters = computed(() =>
-  state.value?.scooters?.filter(s => s.is_broken).length || 0
-)
-const finishedTrips = computed(() =>
-  state.value?.trips?.filter(t => t.finished).length || 0
-)
 </script>
 
-<style scoped>
-button {
+<style>
+#app {
+  font-family: Avenir, Helvetica, Arial, sans-serif;
+  text-align: center;
+  color: #2c3e50;
+  margin-top: 20px;
+  padding: 0 20px;
+}
+
+.instructions {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  background-color: #f5f7fa;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.optimal-values {
+  text-align: left;
+  flex: 2;
+  min-width: 300px;
+}
+
+.plant-instruction {
+  background-color: #e8f4f8;
+  padding: 10px;
+  border-radius: 8px;
+  margin-bottom: 10px;
+}
+
+.plant-instruction h3 {
+  margin-top: 0;
+  color: #2c3e50;
+}
+
+.simulation-controls {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  min-width: 250px;
+}
+
+.simulation-controls button {
+  margin-bottom: 10px;
+  padding: 8px 15px;
+  width: 100%;
+  max-width: 200px;
+  background-color: #4a7bed;
+  color: white;
+  border: none;
+  border-radius: 4px;
   cursor: pointer;
-  transition: background-color 0.2s ease;
+  font-size: 1em;
+}
+
+.simulation-controls button:hover {
+  background-color: #3a6bdd;
+}
+
+.time-control {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  max-width: 200px;
+  margin-top: 10px;
+}
+
+.time-control label {
+  margin-right: 10px;
+  font-size: 0.9em;
+}
+
+.time-control input {
+  flex: 1;
+}
+
+.time-control span {
+  margin-left: 10px;
+  min-width: 40px;
+}
+
+.greenhouse-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.greenhouse-row {
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 15px;
+  background-color: #f9f9f9;
+}
+
+.virtual-time {
+  font-size: 1.2em;
+  font-weight: bold;
+  margin: 10px 0 20px;
+  background-color: #e8f4f8;
+  padding: 8px;
+  border-radius: 4px;
 }
 </style>
