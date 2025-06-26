@@ -218,7 +218,7 @@ export default {
 }
 
 .header-actions button {
-  background-color: #4a7bed;
+  background: none;
   color: white;
   border: none;
   border-radius: 4px;
