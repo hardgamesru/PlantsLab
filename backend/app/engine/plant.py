@@ -47,6 +47,17 @@ class Plant(ABC):
             self.stage = LifeStage.DEAD
             self.health = 0.0
 
+    def calculate_growth_modifier(self, conditions: dict):
+        """Рассчитывает модификатор роста на основе отклонения условий"""
+        temp_diff = abs(conditions['temperature'] - self.optimal_temperature)
+        humidity_diff = abs(conditions['humidity'] - self.optimal_humidity)
+        light_diff = abs(conditions['light'] - self.optimal_light)
+
+        # Суммарное отклонение (нормализованное)
+        total_diff = temp_diff + humidity_diff + light_diff
+        # Модификатор роста: 1.0 при идеальных условиях, уменьшается с отклонением
+        return max(0.1, 1.0 - total_diff / 100)
+
     @abstractmethod
     def update(self, conditions: dict, time_elapsed: float):
         pass
@@ -65,6 +76,8 @@ class Gerbera(Plant):
         # Проверяем здоровье перед обновлением
         self.check_health(conditions, time_elapsed)
         effective_time = time_elapsed * self.growth_rate
+        growth_modifier = self.calculate_growth_modifier(conditions)
+
         # Если растение мертвое, прекращаем обновление
         if self.stage == LifeStage.DEAD:
             return
@@ -75,7 +88,7 @@ class Gerbera(Plant):
             self.stage = LifeStage.GROWING
             self.size = 0.5
         elif self.stage == LifeStage.GROWING and self.size < 5.0:
-            self.size += 0.1 * conditions['light'] / 100 * effective_time
+            self.size += 0.1 * conditions['light'] / 100 * effective_time * growth_modifier
         elif self.stage == LifeStage.GROWING and conditions['temperature'] >= self.flowering_temp:
             self.stage = LifeStage.FLOWERING
         elif self.stage == LifeStage.FLOWERING:
@@ -90,26 +103,31 @@ class Larch(Plant):
         self.optimal_temperature = 18.0
         self.optimal_humidity = 50.0
         self.optimal_light = 60.0
+        self.stratification_required = True
         self.stratified = False
+        self.stratification_time = 0.0
         self.health_change_rate = 0.5  # Медленнее реагирует на изменения
 
     def update(self, conditions: dict, time_elapsed: float):
         # Проверяем здоровье перед обновлением
         self.check_health(conditions, time_elapsed)
         effective_time = time_elapsed * self.growth_rate
+        growth_modifier = self.calculate_growth_modifier(conditions)
 
         # Если растение мертвое, прекращаем обновление
         if self.stage == LifeStage.DEAD:
             return
 
         if not self.stratified and conditions['temperature'] < 5:
-            self.stratified = True
+            self.stratification_time += time_elapsed
+            if self.stratification_time >= 5.0:
+                self.stratified = True
 
         if self.stage == LifeStage.SEED and self.stratified:
             self.stage = LifeStage.SPROUT
         elif self.stage == LifeStage.SPROUT and conditions['humidity'] > 40:
             self.stage = LifeStage.GROWING
         elif self.stage == LifeStage.GROWING:
-            self.size += 0.05 * effective_time
+            self.size += 0.05 * effective_time * growth_modifier
             if self.size > 8.0:
                 self.stage = LifeStage.MATURE
