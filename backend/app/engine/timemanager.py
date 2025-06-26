@@ -10,12 +10,9 @@ class TimeManager:
 
     def update(self):
         if not self.paused:
-            current_time = time.time()
-            real_elapsed = current_time - self.last_update_time
-            virtual_elapsed = real_elapsed * self.time_scale
-            self.virtual_time += virtual_elapsed
-            self.last_update_time = current_time
-            return virtual_elapsed
+            # Увеличиваем виртуальное время на масштаб
+            self.virtual_time += self.time_scale
+            return self.time_scale
         return 0.0
 
     def set_time_scale(self, scale: float):

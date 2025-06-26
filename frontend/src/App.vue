@@ -34,7 +34,7 @@
       </div>
     </div>
 
-    <p class="virtual-time">Виртуальное время: {{ formatTime(state.virtual_time) }}</p>
+    <p class="virtual-time">Виртуальное время: {{ state.virtual_time.toFixed(1) }} у.е.</p>
 
     <!-- Два ряда теплиц -->
     <div class="greenhouse-rows">
@@ -119,14 +119,6 @@ export default {
       await fetchState()
     }
 
-    const formatTime = (seconds) => {
-      const days = Math.floor(seconds / 86400)
-      const hours = Math.floor((seconds % 86400) / 3600)
-      const mins = Math.floor((seconds % 3600) / 60)
-      const secs = Math.floor(seconds % 60)
-      return `${days}д ${hours}ч ${mins}м ${secs}с`
-    }
-
     onMounted(() => {
       setInterval(fetchState, 1000)
     })
@@ -140,7 +132,6 @@ export default {
       resetSystem,
       updateTimeScale,
       updateConditions,
-      formatTime,
       setPlant,
       removePlant
     }

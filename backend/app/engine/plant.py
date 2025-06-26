@@ -12,8 +12,9 @@ class LifeStage(Enum):
 
 
 class Plant(ABC):
-    def __init__(self, name: str):
+    def __init__(self, name: str, growth_rate: float = 1.0):
         self.name = name
+        self.growth_rate = growth_rate  # Коэффициент роста
         self.stage = LifeStage.SEED
         self.size = 0.1
         self.health = 100.0
@@ -26,8 +27,8 @@ class Plant(ABC):
 
     def check_health(self, conditions: dict, time_elapsed: float):
         # Проверка отклонений от оптимальных условий с порогом ±30
-        temp_diff = max(0, abs(conditions['temperature'] - self.optimal_temperature) - 30)
-        humidity_diff = max(0, abs(conditions['humidity'] - self.optimal_humidity) - 30)
+        temp_diff = max(0, abs(conditions['temperature'] - self.optimal_temperature) - 10)
+        humidity_diff = max(0, abs(conditions['humidity'] - self.optimal_humidity) - 20)
         light_diff = max(0, abs(conditions['light'] - self.optimal_light) - 30)
 
         # Суммарное отклонение (только за пределами порога)
@@ -36,7 +37,7 @@ class Plant(ABC):
         # Изменение здоровья в зависимости от условий
         if total_diff == 0:
         # Хорошие условия: здоровье растет
-            self.health = min(100.0, self.health + self.health_change_rate * time_elapsed)
+            self.health = min(100.0, (self.health + self.health_change_rate * time_elapsed))
         else:
         # Ухудшение здоровья пропорционально отклонению
             self.health -= (total_diff / 100) * self.health_change_rate * time_elapsed
@@ -53,7 +54,7 @@ class Plant(ABC):
 
 class Gerbera(Plant):
     def __init__(self):
-        super().__init__("Гербера")
+        super().__init__("Гербера", growth_rate=1.0)
         self.optimal_temperature = 22.0
         self.optimal_humidity = 60.0
         self.optimal_light = 70.0
@@ -63,7 +64,7 @@ class Gerbera(Plant):
     def update(self, conditions: dict, time_elapsed: float):
         # Проверяем здоровье перед обновлением
         self.check_health(conditions, time_elapsed)
-
+        effective_time = time_elapsed * self.growth_rate
         # Если растение мертвое, прекращаем обновление
         if self.stage == LifeStage.DEAD:
             return
@@ -74,7 +75,7 @@ class Gerbera(Plant):
             self.stage = LifeStage.GROWING
             self.size = 0.5
         elif self.stage == LifeStage.GROWING and self.size < 5.0:
-            self.size += 0.1 * conditions['light'] / 100 * time_elapsed
+            self.size += 0.1 * conditions['light'] / 100 * effective_time
         elif self.stage == LifeStage.GROWING and conditions['temperature'] >= self.flowering_temp:
             self.stage = LifeStage.FLOWERING
         elif self.stage == LifeStage.FLOWERING:
@@ -85,7 +86,7 @@ class Gerbera(Plant):
 
 class Larch(Plant):
     def __init__(self):
-        super().__init__("Лиственница")
+        super().__init__("Лиственница", growth_rate=0.3)
         self.optimal_temperature = 18.0
         self.optimal_humidity = 50.0
         self.optimal_light = 60.0
@@ -95,6 +96,7 @@ class Larch(Plant):
     def update(self, conditions: dict, time_elapsed: float):
         # Проверяем здоровье перед обновлением
         self.check_health(conditions, time_elapsed)
+        effective_time = time_elapsed * self.growth_rate
 
         # Если растение мертвое, прекращаем обновление
         if self.stage == LifeStage.DEAD:
@@ -108,6 +110,6 @@ class Larch(Plant):
         elif self.stage == LifeStage.SPROUT and conditions['humidity'] > 40:
             self.stage = LifeStage.GROWING
         elif self.stage == LifeStage.GROWING:
-            self.size += 0.05 * time_elapsed
+            self.size += 0.05 * effective_time
             if self.size > 8.0:
                 self.stage = LifeStage.MATURE
