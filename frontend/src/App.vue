@@ -26,12 +26,18 @@
         <button @click="resetSystem">Перезапустить систему</button>
         <button @click="togglePause">{{ paused ? 'Старт' : 'Пауза' }}</button>
         <button @click="step">Шаг</button>
+        <button @click="showLogModal = true">Показать лог</button>
         <div class="time-control">
           <label>Скорость времени:</label>
           <input type="range" min="0.1" max="100" step="0.1" v-model="timeScale" @change="updateTimeScale">
           <span>{{ timeScale }}x</span>
         </div>
       </div>
+      <LogModal
+      :visible="showLogModal"
+      :greenhouses="state.greenhouses"
+      @close="showLogModal = false"
+    />
     </div>
 
     <p class="virtual-time">Виртуальное время: {{ state.virtual_time.toFixed(1) }} у.е.</p>
@@ -56,14 +62,16 @@
 
 <script>
 import Map from './components/Map.vue'
+import LogModal from './components/LogModal.vue'
 import { ref, onMounted } from 'vue'
 
 export default {
-  components: { Map },
+  components: { Map, LogModal },
   setup() {
     const state = ref({ greenhouses: [], virtual_time: 0 })
     const paused = ref(true)
     const timeScale = ref(1.0)
+    const showLogModal = ref(false)
 
      const setPlant = async (ghId, plantType) => {
       await fetch(`http://localhost:8000/api/greenhouse/${ghId}/plant/${plantType}`, {
@@ -134,7 +142,8 @@ export default {
       updateTimeScale,
       updateConditions,
       setPlant,
-      removePlant
+      removePlant,
+      showLogModal
     }
   }
 }

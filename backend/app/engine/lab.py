@@ -75,3 +75,6 @@ class Lab:
                 } for gh in self.greenhouses.values()
             ]
         }
+
+    def get_greenhouse_states(self):
+        return [gh for gh in self.greenhouses.values()]

@@ -78,3 +78,11 @@ async def reset_system():
         "paused": True,
         "time_scale": 1.0
     }
+
+@router.get("/log")
+async def get_log(gh_id: int = -1):  # -1 означает все теплицы
+    lab.update()
+    if gh_id == -1:
+        return [entry.__dict__ for entry in lab.log]
+    else:
+        return [entry.__dict__ for entry in lab.log if entry.greenhouse_id == gh_id]
