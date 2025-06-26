@@ -103,7 +103,7 @@ export default {
       const data = await response.json()
       // Синхронизируем состояние паузы
       paused.value = data.paused
-      
+      timeScale.value = data.time_scale
       await fetchState()
     }
 

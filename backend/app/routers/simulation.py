@@ -75,5 +75,6 @@ async def reset_system():
     lab.time_manager.paused = True
     return {
         "status": "system reset",
-        "paused": True
+        "paused": True,
+        "time_scale": 1.0
     }

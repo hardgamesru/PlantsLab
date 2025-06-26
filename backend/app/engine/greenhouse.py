@@ -11,6 +11,13 @@ class Greenhouse:
         }
         self.plant = None  # Начальное состояние - без растения
 
+    DEFAULT_CONDITIONS = {
+        'temperature': 20.0,
+        'humidity': 50.0,
+        'light': 70.0,
+        'soil': 'loam'
+    }
+
     def set_plant(self, plant_type: str):
         if plant_type == "gerbera":
             self.plant = Gerbera()
@@ -19,6 +26,7 @@ class Greenhouse:
 
     def remove_plant(self):
         self.plant = None
+        self.conditions = self.DEFAULT_CONDITIONS.copy()
 
     def update_conditions(self, new_conditions: dict):
         self.conditions.update(new_conditions)
