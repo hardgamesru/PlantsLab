@@ -18,6 +18,7 @@ class Plant(ABC):
         self.stage = LifeStage.SEED
         self.size = 0.1
         self.health = 100.0
+        self.time_without_flowering = 0.0
         self.flowering_percent = 0.0  # Процент цветения
         # Оптимальные показатели (задаются в подклассах)
         self.optimal_temperature = 20.0
@@ -89,12 +90,31 @@ class Gerbera(Plant):
             self.size = 0.5
         elif self.stage == LifeStage.GROWING and self.size < 5.0:
             self.size += 0.1 * conditions['light'] / 100 * effective_time * growth_modifier
-        elif self.stage == LifeStage.GROWING and conditions['temperature'] >= self.flowering_temp:
-            self.stage = LifeStage.FLOWERING
+            self.time_without_flowering += time_elapsed
+            if (self.time_without_flowering >= 20) and (conditions['temperature'] >= self.flowering_temp):
+                self.time_without_flowering = 0
+                self.stage = LifeStage.FLOWERING
+
+        elif self.stage == LifeStage.GROWING and self.size >= 5.0:
+            self.stage = LifeStage.MATURE
         elif self.stage == LifeStage.FLOWERING:
             # Увеличиваем процент цветения
             self.flowering_percent = min(100.0, self.flowering_percent + 10 * time_elapsed)
-            self.size = 3.0
+            if self.flowering_percent == 100:
+                self.flowering_percent = 0.0
+                if self.size < 5.0:
+                    self.stage = LifeStage.GROWING
+                else:
+                    self.stage = LifeStage.MATURE
+
+        elif self.stage == LifeStage.MATURE:
+            self.time_without_flowering += time_elapsed
+            if (self.time_without_flowering >= 20) and (conditions['temperature'] >= self.flowering_temp):
+                self.time_without_flowering = 0
+                self.stage = LifeStage.FLOWERING
+
+
+
 
 
 class Larch(Plant):
