@@ -46,13 +46,6 @@ async def update_conditions(gh_id: int, conditions: dict):
     lab.greenhouses[gh_id].update_conditions(conditions)
     return {"status": "conditions updated"}
 
-@router.post("/reset")
-async def reset_system():
-    global lab
-    lab = Lab()
-    # Инициализация 10 теплиц
-    return {"status": "system reset"}
-
 
 @router.post("/greenhouse/{gh_id}/plant/{plant_type}")
 async def set_plant(gh_id: int, plant_type: str):

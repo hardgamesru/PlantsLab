@@ -55,7 +55,7 @@ class Lab:
                         'stage': plant.stage.value,
                         'size': plant.size,
                         'health': plant.health
-                    }
+                    } if plant else None
                 ))
 
     def get_state(self):

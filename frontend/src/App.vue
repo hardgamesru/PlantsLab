@@ -24,7 +24,7 @@
 
       <div class="simulation-controls">
         <button @click="resetSystem">Перезапустить систему</button>
-        <button @click="togglePause">{{ paused ? 'Пауза' : 'Старт' }}</button>
+        <button @click="togglePause">{{ paused ? 'Старт' : 'Пауза' }}</button>
         <button @click="step">Шаг</button>
         <div class="time-control">
           <label>Скорость времени:</label>
@@ -103,6 +103,7 @@ export default {
       const data = await response.json()
       // Синхронизируем состояние паузы
       paused.value = data.paused
+      
       await fetchState()
     }
 
