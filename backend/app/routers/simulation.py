@@ -1,4 +1,6 @@
 from fastapi import APIRouter, HTTPException
+
+
 from ..engine.lab import Lab  # Измененный импорт
 import json
 
@@ -26,7 +28,7 @@ async def step():
 
 @router.post("/time_scale/{scale}")
 async def set_time_scale(scale: float):
-    if scale < 0.1 or scale > 100.0:
+    if scale < 0.1 or scale > 1000.0:
         raise HTTPException(status_code=400, detail="Invalid scale value")
     lab.time_manager.set_time_scale(scale)
     return {"status": "scale updated"}

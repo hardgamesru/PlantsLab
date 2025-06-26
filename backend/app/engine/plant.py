@@ -113,10 +113,6 @@ class Gerbera(Plant):
                 self.time_without_flowering = 0
                 self.stage = LifeStage.FLOWERING
 
-
-
-
-
 class Larch(Plant):
     def __init__(self):
         super().__init__("Лиственница", growth_rate=0.3)
@@ -149,5 +145,25 @@ class Larch(Plant):
             self.stage = LifeStage.GROWING
         elif self.stage == LifeStage.GROWING:
             self.size += 0.05 * effective_time * growth_modifier
+            self.time_without_flowering += time_elapsed
+            if (self.time_without_flowering >= 50):
+                self.time_without_flowering = 0
+                self.stage = LifeStage.FLOWERING
             if self.size > 8.0:
                 self.stage = LifeStage.MATURE
+
+        elif self.stage == LifeStage.FLOWERING:
+            # Увеличиваем процент цветения
+            self.flowering_percent = min(100.0, self.flowering_percent + 10 * time_elapsed)
+            if self.flowering_percent == 100:
+                self.flowering_percent = 0.0
+                if self.size < 8.0:
+                    self.stage = LifeStage.GROWING
+                else:
+                    self.stage = LifeStage.MATURE
+
+        elif self.stage == LifeStage.MATURE:
+            self.time_without_flowering += time_elapsed
+            if (self.time_without_flowering >= 50):
+                self.time_without_flowering = 0.0
+                self.stage = LifeStage.FLOWERING
