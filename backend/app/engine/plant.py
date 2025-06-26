@@ -60,6 +60,7 @@ class Plant(ABC):
         total_diff = temp_diff + humidity_diff + light_diff
         # Модификатор роста: 1.0 при идеальных условиях, уменьшается с отклонением
         return max(0.1, 1.0 - total_diff / 100)
+
     def check_for_events(self, new_stage: LifeStage, old_stage: LifeStage):
         events = []
 
@@ -190,3 +191,4 @@ class Larch(Plant):
             if (self.time_without_flowering >= 50):
                 self.time_without_flowering = 0.0
                 self.stage = LifeStage.FLOWERING
+

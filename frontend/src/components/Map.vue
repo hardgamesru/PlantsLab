@@ -10,8 +10,7 @@
         <h3>Теплица {{ gh.id }}</h3>
         <p>Растение не посажено</p>
         <div class="plant-options">
-          <button @click="$emit('set-plant', gh.id, 'gerbera')">Посадить Герберу</button>
-          <button @click="$emit('set-plant', gh.id, 'larch')">Посадить Лиственницу</button>
+          <button @click="openPlantModal(gh.id)">Посадить растение</button>
         </div>
       </div>
 
@@ -82,6 +81,18 @@
         </div>
       </div>
     </div>
+    <div class="modal-overlay" v-if="showPlantModal">
+      <div class="plant-modal">
+        <div class="modal-header">
+          <h3>Выберите растение</h3>
+          <button class="close-btn" @click="showPlantModal = false">✕</button>
+        </div>
+        <div class="modal-content">
+          <button @click="selectPlant('gerbera')">Гербера</button>
+          <button @click="selectPlant('larch')">Лиственница</button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -132,12 +143,29 @@ export default {
       return plant.health > 70 ? 'green' : plant.health > 30 ? 'yellow' : 'red';
     }
 
+    const showPlantModal = ref(false)
+    const selectedGhId = ref(null)
+
+    const openPlantModal = (ghId) => {
+      selectedGhId.value = ghId
+      showPlantModal.value = true
+    }
+
+    const selectPlant = (plantType) => {
+      if (selectedGhId.value !== null) {
+        emit('set-plant', selectedGhId.value, plantType)
+      }
+      showPlantModal.value = false
+    }
     return {
       localGreenhouses,
       updateGhConditions,
       healthClass,
       plantStyle,
-      getPlantColor
+      getPlantColor,
+      showPlantModal,
+      openPlantModal,
+      selectPlant
     }
   }
 }
@@ -332,5 +360,73 @@ export default {
   .greenhouse {
     min-width: 160px;
   }
+}
+</style>
+
+<style scoped>
+/* Добавляем стили для модального окна */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.plant-modal {
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  width: 300px;
+  overflow: hidden;
+}
+
+.modal-header {
+  padding: 15px;
+  background-color: #2c3e50;
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-header h3 {
+  margin: 0;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 1.5em;
+  cursor: pointer;
+  color: white;
+  padding: 5px;
+}
+
+.modal-content {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.modal-content button {
+  padding: 12px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 1.1em;
+  transition: background-color 0.3s;
+}
+
+.modal-content button:hover {
+  background-color: #3e8e41;
 }
 </style>

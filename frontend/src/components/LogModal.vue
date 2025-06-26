@@ -29,14 +29,14 @@
                :class="['log-entry', eventClass(entry)]">
             <div class="entry-header">
               <span class="real-time">{{ entry.real_time }}</span>
+              <span class="event-type">Теплица {{ entry.greenhouse_id }}</span>
               <span class="event-type">{{ entry.event_type }}</span>
               <button class="delete-entry" @click="removeEntry(index)">✕</button>
             </div>
 
             <div class="entry-content">
               <div class="greenhouse-info">
-                <span class="gh-id">Теплица {{ entry.greenhouse_id }}</span>
-                <span class="virtual-time">(Время: {{ entry.timestamp.toFixed(1) }} у.е.)</span>
+                <span class="event-type">Время: {{ entry.timestamp.toFixed(1) }} у.е.</span>
               </div>
 
               <div class="event-details">

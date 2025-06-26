@@ -2,30 +2,21 @@
   <div id="app">
     <h1>Лаборатория растений</h1>
 
-    <!-- Инструкция и оптимальные значения -->
     <div class="instructions">
-      <div class="optimal-values">
-        <h2>Инструкция по выращиванию</h2>
-        <div class="plant-instruction">
-          <h3>Гербера</h3>
-          <p>Оптимальная температура: 22±10°C</p>
-          <p>Оптимальная влажность: 60±20%</p>
-          <p>Оптимальное освещение: 70±30%</p>
-          <p>Растение цветет при температуре ≥22°C</p>
-        </div>
-        <div class="plant-instruction">
-          <h3>Лиственница</h3>
-          <p>Оптимальная температура: 18±10°C</p>
-          <p>Оптимальная влажность: 50±20%</p>
-          <p>Оптимальное освещение: 60±30%</p>
-          <p>Требуется стратификация (t < 5°C)</p>
-        </div>
+      <div class="quick-guide">
+        <h2>Краткое руководство</h2>
+        <p>В этой программе вы можете управлять теплицами и выращивать растения.
+           Для начала выберите теплицу и посадите растение (герберу или лиственницу).
+           Управляйте условиями в теплице с помощью ползунков.
+           Следите за здоровьем растения и его стадиями роста.
+           Используйте кнопки управления временем для контроля над симуляцией.</p>
       </div>
 
       <div class="simulation-controls">
         <button @click="resetSystem">Перезапустить систему</button>
         <button @click="togglePause">{{ paused ? 'Старт' : 'Пауза' }}</button>
         <button @click="step">Шаг</button>
+        <button @click="showInstructionsModal = true">Инструкция по выращиванию</button>
         <button @click="showLogModal = true">Показать лог</button>
         <div class="time-control">
           <label>Скорость времени:</label>
@@ -33,12 +24,18 @@
           <span>{{ timeScale }}x</span>
         </div>
       </div>
-      <LogModal
+    </div>
+
+    <LogModal
       :visible="showLogModal"
       :greenhouses="state.greenhouses"
       @close="showLogModal = false"
     />
-    </div>
+
+    <InstructionsModal
+      :visible="showInstructionsModal"
+      @close="showInstructionsModal = false"
+    />
 
     <p class="virtual-time">Виртуальное время: {{ state.virtual_time.toFixed(1) }} у.е.</p>
 
@@ -63,17 +60,19 @@
 <script>
 import Map from './components/Map.vue'
 import LogModal from './components/LogModal.vue'
+import InstructionsModal from './components/InstructionsModal.vue'
 import { ref, onMounted } from 'vue'
 
 export default {
-  components: { Map, LogModal },
+  components: { Map, LogModal, InstructionsModal },
   setup() {
     const state = ref({ greenhouses: [], virtual_time: 0 })
     const paused = ref(true)
     const timeScale = ref(1.0)
     const showLogModal = ref(false)
+    const showInstructionsModal = ref(false)
 
-     const setPlant = async (ghId, plantType) => {
+    const setPlant = async (ghId, plantType) => {
       await fetch(`http://localhost:8000/api/greenhouse/${ghId}/plant/${plantType}`, {
         method: 'POST'
       })
@@ -109,7 +108,6 @@ export default {
     const resetSystem = async () => {
       const response = await fetch('http://localhost:8000/api/reset', { method: 'POST' })
       const data = await response.json()
-      // Синхронизируем состояние паузы
       paused.value = data.paused
       timeScale.value = data.time_scale
       await fetchState()
@@ -136,14 +134,15 @@ export default {
       state,
       paused,
       timeScale,
+      showLogModal,
+      showInstructionsModal,
       togglePause,
       step,
       resetSystem,
       updateTimeScale,
       updateConditions,
       setPlant,
-      removePlant,
-      showLogModal
+      removePlant
     }
   }
 }
@@ -169,22 +168,15 @@ export default {
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
-.optimal-values {
+.quick-guide {
   text-align: left;
   flex: 2;
   min-width: 300px;
+  font-size: 20px;
 }
 
-.plant-instruction {
-  background-color: #e8f4f8;
-  padding: 10px;
-  border-radius: 8px;
-  margin-bottom: 10px;
-}
-
-.plant-instruction h3 {
+.quick-guide h2 {
   margin-top: 0;
-  color: #2c3e50;
 }
 
 .simulation-controls {
@@ -199,7 +191,7 @@ export default {
   margin-bottom: 10px;
   padding: 8px 15px;
   width: 100%;
-  max-width: 200px;
+  max-width: 250px;
   background-color: #4a7bed;
   color: white;
   border: none;
@@ -216,7 +208,7 @@ export default {
   display: flex;
   align-items: center;
   width: 100%;
-  max-width: 200px;
+  max-width: 250px;
   margin-top: 10px;
 }
 
