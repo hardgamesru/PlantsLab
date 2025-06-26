@@ -81,8 +81,17 @@ async def reset_system():
 
 @router.get("/log")
 async def get_log(gh_id: int = -1):  # -1 означает все теплицы
-    lab.update()
     if gh_id == -1:
-        return [entry.__dict__ for entry in lab.log]
+        return [entry.to_dict() for entry in lab.log][::-1]  # Новые записи сверху
     else:
-        return [entry.__dict__ for entry in lab.log if entry.greenhouse_id == gh_id]
+        return [entry.to_dict() for entry in lab.log if entry.greenhouse_id == gh_id][::-1]
+
+@router.post("/log/clear")
+async def clear_log():
+    lab.clear_log()
+    return {"status": "log cleared"}
+
+@router.delete("/log/{entry_index}")
+async def remove_log_entry(entry_index: int):
+    lab.remove_log_entry(entry_index)
+    return {"status": "entry removed"}

@@ -1,3 +1,4 @@
+from .logentry import LogEventType
 from .plant import Gerbera, Larch
 
 class Greenhouse:
@@ -24,15 +25,27 @@ class Greenhouse:
         elif plant_type == "larch":
             self.plant = Larch()
 
+        # Записываем событие посадки
+        return LogEventType.PLANT_ADDED, f"Посажено растение: {plant_type}"
+
     def remove_plant(self):
+        plant_name = self.plant.name if self.plant else "Неизвестное растение"
         self.plant = None
         self.conditions = self.DEFAULT_CONDITIONS.copy()
+
+        # Записываем событие удаления
+        return LogEventType.PLANT_REMOVED, f"Удалено растение: {plant_name}"
+
+    def update_plant(self, time_elapsed: float):
+        if self.plant:
+            old_stage = self.plant.stage
+            self.plant.update(self.conditions, time_elapsed)
+            new_stage = self.plant.stage
+
+            # Возвращаем растение и список событий
+            return self.plant, self.plant.check_for_events(new_stage, old_stage)
+        return None, []
 
     def update_conditions(self, new_conditions: dict):
         self.conditions.update(new_conditions)
 
-    def update_plant(self, time_elapsed: float):
-        if self.plant:
-            self.plant.update(self.conditions, time_elapsed)
-            return self.plant
-        return None

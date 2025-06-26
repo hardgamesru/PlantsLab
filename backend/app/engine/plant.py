@@ -1,6 +1,8 @@
 from enum import Enum
 from abc import ABC, abstractmethod
 
+from .logentry import LogEventType
+
 
 class LifeStage(Enum):
     SEED = "Семя"
@@ -58,6 +60,24 @@ class Plant(ABC):
         total_diff = temp_diff + humidity_diff + light_diff
         # Модификатор роста: 1.0 при идеальных условиях, уменьшается с отклонением
         return max(0.1, 1.0 - total_diff / 100)
+    def check_for_events(self, new_stage: LifeStage, old_stage: LifeStage):
+        events = []
+
+        # Событие смены стадии
+        if new_stage != old_stage:
+            events.append((
+                LogEventType.STAGE_CHANGED,
+                f"Стадия изменена: {old_stage.value} → {new_stage.value}"
+            ))
+
+        # Событие смерти растения
+        if new_stage == LifeStage.DEAD and old_stage != LifeStage.DEAD:
+            events.append((
+                LogEventType.PLANT_DIED,
+                "Растение погибло"
+            ))
+
+        return events
 
     @abstractmethod
     def update(self, conditions: dict, time_elapsed: float):
@@ -112,6 +132,9 @@ class Gerbera(Plant):
             if (self.time_without_flowering >= 20) and (conditions['temperature'] >= self.flowering_temp):
                 self.time_without_flowering = 0
                 self.stage = LifeStage.FLOWERING
+
+
+
 
 class Larch(Plant):
     def __init__(self):
