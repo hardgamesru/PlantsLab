@@ -113,6 +113,6 @@ class Lab:
     def clear_log(self):
         self.log = []
 
-    def remove_log_entry(self, index: int):
-        if 0 <= index < len(self.log):
-            self.log.pop(index)
+    def remove_log_entry(self, entry_id: str):
+        """Удаляет запись по уникальному идентификатору"""
+        self.log = [entry for entry in self.log if entry.id != entry_id]

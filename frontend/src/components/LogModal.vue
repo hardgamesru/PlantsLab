@@ -31,7 +31,7 @@
               <span class="real-time">{{ entry.real_time }}</span>
               <span class="event-type">Теплица {{ entry.greenhouse_id }}</span>
               <span class="event-type">{{ entry.event_type }}</span>
-              <button class="delete-entry" @click="removeEntry(index)">✕</button>
+              <button class="delete-entry" @click="removeEntry(entry.id)">✕</button>
             </div>
 
             <div class="entry-content">
@@ -114,9 +114,11 @@ export default {
       }
     }
 
-    const removeEntry = async (index) => {
-      await fetch(`http://localhost:8000/api/log/${index}`, { method: 'DELETE' })
-      await fetchLog()
+    const removeEntry = async (entryId) => {
+      if (confirm('Вы уверены, что хотите удалить эту запись?')) {
+        await fetch(`http://localhost:8000/api/log/${entryId}`, { method: 'DELETE' })
+        await fetchLog()
+      }
     }
 
     const close = () => {

@@ -1,6 +1,6 @@
 from datetime import datetime
 from enum import Enum
-
+import uuid
 
 class LogEventType(Enum):
     PLANT_ADDED = "Посадка растения"
@@ -13,6 +13,7 @@ class LogEventType(Enum):
 class LogEntry:
     def __init__(self, timestamp: float, greenhouse_id: int, event_type: LogEventType,
                  conditions: dict = None, plant_data: dict = None, event_details: str = None):
+        self.id = str(uuid.uuid4())  # Уникальный идентификатор
         self.timestamp = timestamp
         self.greenhouse_id = greenhouse_id
         self.event_type = event_type
@@ -23,6 +24,7 @@ class LogEntry:
 
     def to_dict(self):
         return {
+            'id': self.id,  # Добавляем ID в словарь
             'timestamp': self.timestamp,
             'greenhouse_id': self.greenhouse_id,
             'event_type': self.event_type.value,

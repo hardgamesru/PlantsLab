@@ -91,7 +91,7 @@ async def clear_log():
     lab.clear_log()
     return {"status": "log cleared"}
 
-@router.delete("/log/{entry_index}")
-async def remove_log_entry(entry_index: int):
-    lab.remove_log_entry(entry_index)
+@router.delete("/log/{entry_id}")
+async def remove_log_entry(entry_id: str):  # Изменяем тип параметра
+    lab.remove_log_entry(entry_id)
     return {"status": "entry removed"}
