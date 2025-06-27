@@ -82,17 +82,53 @@
       </div>
     </div>
     <div class="modal-overlay" v-if="showPlantModal">
-      <div class="plant-modal">
-        <div class="modal-header">
-          <h3>Выберите растение</h3>
-          <button class="close-btn" @click="showPlantModal = false">✕</button>
-        </div>
-        <div class="modal-content">
-          <button @click="selectPlant('gerbera')">Гербера</button>
-          <button @click="selectPlant('larch')">Лиственница</button>
-          <button @click="selectPlant('cactus')">Кактус</button>
-          <button @click="selectPlant('orchid')">Орхидея</button>
-          <button @click="selectPlant('sunflower')">Подсолнух</button>
+        <div class="plant-modal">
+          <div class="modal-header">
+            <h3>Выберите растение</h3>
+            <button class="close-btn" @click="showPlantModal = false">✕</button>
+          </div>
+            <div class="modal-content">
+          <div class="plant-columns">
+            <!-- Первый столбец -->
+            <div class="plant-column">
+              <button @click="selectPlant('gerbera')">
+                <div class="plant-icon">🌼</div>
+                <div>Гербера</div>
+              </button>
+              <button @click="selectPlant('larch')">
+                <div class="plant-icon">🌲</div>
+                <div>Лиственница</div>
+              </button>
+              <button @click="selectPlant('cactus')">
+                <div class="plant-icon">🌵</div>
+                <div>Кактус</div>
+              </button>
+              <button @click="selectPlant('orchid')">
+                <div class="plant-icon">🌸</div>
+                <div>Орхидея</div>
+              </button>
+            </div>
+
+            <!-- Второй столбец -->
+            <div class="plant-column">
+              <button @click="selectPlant('sunflower')">
+                <div class="plant-icon">🌻</div>
+                <div>Подсолнух</div>
+              </button>
+              <button @click="selectPlant('flytrap')">
+                <div class="plant-icon">🍃</div>
+                <div>Венерина мухоловка</div>
+              </button>
+              <button @click="selectPlant('saguaro')">
+                <div class="plant-icon">🌵</div>
+                <div>Кактус Сагуаро</div>
+              </button>
+              <button @click="selectPlant('rafflesia')">
+                <div class="plant-icon">🎪</div>
+                <div>Раффлезия</div>
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -143,11 +179,15 @@ export default {
     const getPlantColor = (plant) => {
       if (plant.health <= 0) return 'gray';
       if (plant.stage === 'Цветение') {
-        // Разные цвета цветения для разных растений
-        if (plant.name === 'Кактус') return '#FF69B4'; // Розовый
-        if (plant.name === 'Орхидея') return '#DA70D6'; // Орхидейный
-        if (plant.name === 'Подсолнух') return '#FFD700'; // Золотой
-        return 'pink'; // По умолчанию
+        switch(plant.name) {
+          case 'Гербера': return '#FF69B4';       // Розовый
+          case 'Орхидея': return '#DA70D6';       // Орхидейный
+          case 'Подсолнух': return '#FFD700';     // Золотой
+          case 'Венерина мухоловка': return '#FF0000'; // Красный
+          case 'Кактус Сагуаро': return '#FF69B4';    // Розовый
+          case 'Раффлезия': return '#8B0000';     // Темно-красный
+          default: return 'pink';
+        }
       }
       return plant.health > 70 ? 'green' : plant.health > 30 ? 'yellow' : 'red';
     }
@@ -225,7 +265,19 @@ export default {
   justify-content: space-between;
   align-items: center;
 }
+.header-row button {
+  background: none;
+  color: red;
+  border: none;
+  border-radius: 4px;
+  padding: 8px 15px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
 
+.header-row button:hover {
+  background-color: #3a6bdd;
+}
 .remove-btn {
   background: none;
   border: none;
@@ -391,7 +443,7 @@ export default {
   background-color: white;
   border-radius: 12px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-  width: 300px;
+  width: 600px;
   overflow: hidden;
 }
 
@@ -402,6 +454,19 @@ export default {
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+.modal-header button {
+  background: none;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 8px 15px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.modal-header button:hover {
+  background-color: #3a6bdd;
 }
 
 .modal-header h3 {
@@ -437,5 +502,41 @@ export default {
 
 .modal-content button:hover {
   background-color: #3e8e41;
+}
+
+.plant-columns {
+  display: flex;
+  gap: 20px;
+}
+
+.plant-column {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.plant-column button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 15px 10px;
+  background-color: #4CAF50;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.plant-column button:hover {
+  background-color: #e9f5e9;
+  transform: translateY(-3px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.plant-icon {
+  font-size: 2em;
+  margin-bottom: 8px;
 }
 </style>

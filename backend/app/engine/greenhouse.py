@@ -1,5 +1,5 @@
 from .logentry import LogEventType
-from .plant import Gerbera, Larch, Cactus, Orchid, Sunflower
+from .plant import Gerbera, Larch, Cactus, Orchid, Sunflower, Flytrap, SaguaroCactus, Rafflesia
 
 class Greenhouse:
     def __init__(self, id: int):
@@ -30,6 +30,12 @@ class Greenhouse:
             self.plant = Orchid()
         elif plant_type == "sunflower":
             self.plant = Sunflower()
+        elif plant_type == "flytrap":
+            self.plant = Flytrap()
+        elif plant_type == "saguaro":
+            self.plant = SaguaroCactus()
+        elif plant_type == "rafflesia":
+            self.plant = Rafflesia()
 
         # Записываем событие посадки
         return LogEventType.PLANT_ADDED, f"Посажено растение: {plant_type}"

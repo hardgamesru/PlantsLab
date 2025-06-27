@@ -319,3 +319,149 @@ class Sunflower(Plant):
             if (self.time_without_flowering >= 15 and (conditions['light'] > 80)):
                 self.time_without_flowering = 0.0
                 self.stage = LifeStage.FLOWERING
+
+
+class Flytrap(Plant):  # Венерина мухоловка
+    def __init__(self):
+        super().__init__("Венерина мухоловка", growth_rate=0.7)
+        self.optimal_temperature = 25.0
+        self.optimal_humidity = 80.0
+        self.optimal_light = 50.0
+        self.health_change_rate = 1.2
+        self.flowering_temp = 25.0
+
+    def update(self, conditions: dict, time_elapsed: float):
+        self.check_health(conditions, time_elapsed)
+        effective_time = time_elapsed * self.growth_rate
+        growth_modifier = self.calculate_growth_modifier(conditions)
+
+        if self.stage == LifeStage.DEAD:
+            return
+
+        # Специальные условия для всходов
+        if self.stage == LifeStage.SEED:
+            if conditions['humidity'] > 85:
+                self.stage = LifeStage.SPROUT
+
+        elif self.stage == LifeStage.SPROUT and conditions['temperature'] > 20:
+            self.stage = LifeStage.GROWING
+            self.size = 0.4
+
+        elif self.stage == LifeStage.GROWING and self.size < 3.5:
+            self.size += 0.07 * effective_time * growth_modifier
+            self.time_without_flowering += time_elapsed
+            if (self.time_without_flowering >= 30 and
+                    abs(conditions['temperature'] - self.flowering_temp) < 2):
+                self.time_without_flowering = 0
+                self.stage = LifeStage.FLOWERING
+
+        elif self.stage == LifeStage.GROWING and self.size >= 3.5:
+            self.stage = LifeStage.MATURE
+
+        elif self.stage == LifeStage.FLOWERING:
+            self.flowering_percent = min(100.0, self.flowering_percent + 6 * time_elapsed)
+            if self.flowering_percent == 100:
+                self.flowering_percent = 0.0
+                self.stage = LifeStage.MATURE
+
+        elif self.stage == LifeStage.MATURE:
+            self.time_without_flowering += time_elapsed
+            if (self.time_without_flowering >= 30 and
+                    abs(conditions['temperature'] - self.flowering_temp) < 2):
+                self.time_without_flowering = 0
+                self.stage = LifeStage.FLOWERING
+
+
+class SaguaroCactus(Plant):  # Кактус Сагуаро
+    def __init__(self):
+        super().__init__("Кактус Сагуаро", growth_rate=0.2)
+        self.optimal_temperature = 35.0
+        self.optimal_humidity = 15.0
+        self.optimal_light = 95.0
+        self.flowering_temp = 40.0
+        self.health_change_rate = 0.3
+
+    def update(self, conditions: dict, time_elapsed: float):
+        self.check_health(conditions, time_elapsed)
+        effective_time = time_elapsed * self.growth_rate
+        growth_modifier = self.calculate_growth_modifier(conditions)
+
+        if self.stage == LifeStage.DEAD:
+            return
+
+        # Специальные условия для всходов
+        if self.stage == LifeStage.SEED:
+            if conditions['humidity'] < 20 and conditions['temperature'] > 30:
+                self.stage = LifeStage.SPROUT
+
+        elif self.stage == LifeStage.SPROUT and conditions['light'] > 90:
+            self.stage = LifeStage.GROWING
+            self.size = 0.3
+
+        elif self.stage == LifeStage.GROWING and self.size < 15.0:
+            self.size += 0.03 * effective_time * growth_modifier
+            self.time_without_flowering += time_elapsed
+            if (self.time_without_flowering >= 100 and
+                    conditions['temperature'] >= self.flowering_temp):
+                self.time_without_flowering = 0
+                self.stage = LifeStage.FLOWERING
+
+        elif self.stage == LifeStage.GROWING and self.size >= 15.0:
+            self.stage = LifeStage.MATURE
+
+        elif self.stage == LifeStage.FLOWERING:
+            self.flowering_percent = min(100.0, self.flowering_percent + 1 * time_elapsed)
+            if self.flowering_percent == 100:
+                self.flowering_percent = 0.0
+                self.stage = LifeStage.MATURE
+
+        elif self.stage == LifeStage.MATURE:
+            self.time_without_flowering += time_elapsed
+            if (self.time_without_flowering >= 100 and
+                    conditions['temperature'] >= self.flowering_temp):
+                self.time_without_flowering = 0
+                self.stage = LifeStage.FLOWERING
+
+
+class Rafflesia(Plant):  # Раффлезия
+    def __init__(self):
+        super().__init__("Раффлезия", growth_rate=1.5)
+        self.optimal_temperature = 28.0
+        self.optimal_humidity = 95.0
+        self.optimal_light = 5.0
+        self.health_change_rate = 2.0
+        self.lifespan = 7.0  # Продолжительность жизни после цветения
+
+    def update(self, conditions: dict, time_elapsed: float):
+        self.check_health(conditions, time_elapsed)
+        effective_time = time_elapsed * self.growth_rate
+        growth_modifier = self.calculate_growth_modifier(conditions)
+
+        if self.stage == LifeStage.DEAD:
+            return
+
+        # Специальные условия для всходов
+        if self.stage == LifeStage.SEED:
+            if conditions['light'] < 5 and conditions['humidity'] > 95:
+                self.stage = LifeStage.SPROUT
+
+        elif self.stage == LifeStage.SPROUT and conditions['temperature'] > 25:
+            self.stage = LifeStage.GROWING
+
+        elif self.stage == LifeStage.GROWING and self.size < 5.0:
+            self.size += 0.15 * effective_time * growth_modifier
+            if self.size >= 5.0:
+                self.stage = LifeStage.FLOWERING
+                self.flowering_start_time = self.time_without_flowering
+
+        elif self.stage == LifeStage.FLOWERING:
+            # Цветет только в полной темноте
+            if conditions['light'] > 10:
+                self.health -= 20 * time_elapsed
+
+            self.flowering_percent = min(100.0, self.flowering_percent + 15 * time_elapsed)
+
+            # После начала цветения живет ограниченное время
+            if (self.time_without_flowering - self.flowering_start_time) >= self.lifespan:
+                self.stage = LifeStage.DEAD
+                self.health = 0
