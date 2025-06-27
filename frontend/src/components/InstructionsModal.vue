@@ -8,15 +8,15 @@
 
       <div class="modal-content">
         <div class="plant-instructions">
+
           <div class="plant-section">
             <h3>Гербера</h3>
             <ul>
               <li>Оптимальная температура: <strong>22±10°C</strong></li>
               <li>Оптимальная влажность: <strong>60±20%</strong></li>
               <li>Оптимальное освещение: <strong>70±30%</strong></li>
-              <li>Растение цветет при температуре ≥22°C каждые <strong>20 у.е.</strong></li>
-              <li>Светолюбивая</li>
-              <li>Максимальный размер: <strong>5</strong></li>
+              <li>Цветение при ≥22°C каждые <strong>20 у.е.</strong></li>
+              <li>Макс. размер: <strong>5</strong></li>
             </ul>
           </div>
 
@@ -26,8 +26,45 @@
               <li>Оптимальная температура: <strong>18±10°C</strong></li>
               <li>Оптимальная влажность: <strong>50±20%</strong></li>
               <li>Оптимальное освещение: <strong>60±30%</strong></li>
-              <li>Требуется стратификация (температура <strong>ниже 5°C</strong>)</li>
-              <li>Растение цветет каждые <strong>50 у.е.</strong></li>
+              <li>Требуется стратификация (<strong>&lt;5°C</strong>)</li>
+              <li>Цветение каждые <strong>50 у.е.</strong></li>
+            </ul>
+          </div>
+
+
+          <div class="plant-section">
+            <h3>Кактус</h3>
+            <ul>
+              <li>Оптимальная температура: <strong>30±10°C</strong></li>
+              <li>Оптимальная влажность: <strong>20±10%</strong></li>
+              <li>Оптимальное освещение: <strong>90±10%</strong></li>
+              <li>Цветение при ≥35°C каждые <strong>40 у.е.</strong></li>
+              <li>Устойчив к засухе</li>
+              <li>Макс. размер: <strong>3</strong></li>
+            </ul>
+          </div>
+
+          <div class="plant-section">
+            <h3>Орхидея</h3>
+            <ul>
+              <li>Оптимальная температура: <strong>22±3°C</strong></li>
+              <li>Оптимальная влажность: <strong>80±10%</strong></li>
+              <li>Оптимальное освещение: <strong>40±20%</strong></li>
+              <li>Цветение при стабильной температуре каждые <strong>25 у.е.</strong></li>
+              <li>Требует высокой влажности</li>
+              <li>Макс. размер: <strong>4</strong></li>
+            </ul>
+          </div>
+
+          <div class="plant-section">
+            <h3>Подсолнух</h3>
+            <ul>
+              <li>Оптимальная температура: <strong>25±5°C</strong></li>
+              <li>Оптимальная влажность: <strong>50±10%</strong></li>
+              <li>Оптимальное освещение: <strong>95±5%</strong></li>
+              <li>Цветение при >80% света каждые <strong>15 у.е.</strong></li>
+              <li>Быстро растет</li>
+              <li>Макс. размер: <strong>10</strong></li>
             </ul>
           </div>
         </div>

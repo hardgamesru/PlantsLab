@@ -51,7 +51,7 @@ async def update_conditions(gh_id: int, conditions: dict):
 async def set_plant(gh_id: int, plant_type: str):
     if gh_id not in lab.greenhouses:
         raise HTTPException(status_code=404, detail="Greenhouse not found")
-    if plant_type not in ["gerbera", "larch"]:
+    if plant_type not in ["gerbera", "larch", "cactus", "orchid", "sunflower"]:
         raise HTTPException(status_code=400, detail="Invalid plant type")
 
     lab.set_plant(gh_id, plant_type)

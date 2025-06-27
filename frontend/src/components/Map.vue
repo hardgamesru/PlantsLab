@@ -90,6 +90,9 @@
         <div class="modal-content">
           <button @click="selectPlant('gerbera')">Гербера</button>
           <button @click="selectPlant('larch')">Лиственница</button>
+          <button @click="selectPlant('cactus')">Кактус</button>
+          <button @click="selectPlant('orchid')">Орхидея</button>
+          <button @click="selectPlant('sunflower')">Подсолнух</button>
         </div>
       </div>
     </div>
@@ -139,7 +142,13 @@ export default {
 
     const getPlantColor = (plant) => {
       if (plant.health <= 0) return 'gray';
-      if (plant.stage === 'Цветение') return 'pink';
+      if (plant.stage === 'Цветение') {
+        // Разные цвета цветения для разных растений
+        if (plant.name === 'Кактус') return '#FF69B4'; // Розовый
+        if (plant.name === 'Орхидея') return '#DA70D6'; // Орхидейный
+        if (plant.name === 'Подсолнух') return '#FFD700'; // Золотой
+        return 'pink'; // По умолчанию
+      }
       return plant.health > 70 ? 'green' : plant.health > 30 ? 'yellow' : 'red';
     }
 
