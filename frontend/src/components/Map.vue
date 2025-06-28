@@ -44,7 +44,9 @@
         <!-- Управление условиями -->
         <div class="conditions-controls">
           <div class="control-group">
-            <label>Температура: {{ gh.conditions.temperature }}°C</label>
+            <label :class="getValueColor(gh, 'temperature')">
+              Температура: {{ gh.conditions.temperature }}°C
+            </label>
             <input
               type="range"
               min="0"
@@ -56,7 +58,9 @@
           </div>
 
           <div class="control-group">
-            <label>Влажность: {{ gh.conditions.humidity }}%</label>
+            <label :class="getValueColor(gh, 'humidity')">
+              Влажность: {{ gh.conditions.humidity }}%
+            </label>
             <input
               type="range"
               min="0"
@@ -68,7 +72,9 @@
           </div>
 
           <div class="control-group">
-            <label>Свет: {{ gh.conditions.light }}%</label>
+            <label :class="getValueColor(gh, 'light')">
+              Свет: {{ gh.conditions.light }}%
+            </label>
             <input
               type="range"
               min="0"
@@ -78,6 +84,15 @@
               @change="updateGhConditions(gh.id)"
             >
           </div>
+
+          <!-- Кнопка для установки оптимальных условий -->
+          <button
+            v-if="gh.plant"
+            @click="setOptimalConditions(gh.id)"
+            class="optimal-btn"
+          >
+            Выставить оптимальные настройки
+          </button>
         </div>
       </div>
     </div>
@@ -206,6 +221,54 @@ export default {
       }
       showPlantModal.value = false
     }
+
+    // Карта оптимальных условий для каждого растения
+    const optimalConditionsMap = {
+      'Гербера': { temperature: 22, humidity: 60, light: 70 },
+      'Лиственница': { temperature: 18, humidity: 50, light: 60 },
+      'Кактус': { temperature: 30, humidity: 20, light: 90 },
+      'Орхидея': { temperature: 22, humidity: 80, light: 40 },
+      'Подсолнух': { temperature: 25, humidity: 50, light: 95 },
+      'Венерина мухоловка': { temperature: 25, humidity: 80, light: 50 },
+      'Кактус Сагуаро': { temperature: 35, humidity: 15, light: 95 },
+      'Раффлезия': { temperature: 28, humidity: 95, light: 5 }
+    };
+
+    // Установка оптимальных условий
+    const setOptimalConditions = (ghId) => {
+      const gh = localGreenhouses.value.find(g => g.id === ghId);
+      if (gh && gh.plant) {
+        const optimal = optimalConditionsMap[gh.plant.name];
+        if (optimal) {
+          gh.conditions.temperature = optimal.temperature;
+          gh.conditions.humidity = optimal.humidity;
+          gh.conditions.light = optimal.light;
+          updateGhConditions(ghId);
+        }
+      }
+    };
+
+    // Определение цвета для значения параметра
+    const getValueColor = (gh, conditionType) => {
+      if (!gh.plant) return '';
+
+      const plantName = gh.plant.name;
+      const optimal = optimalConditionsMap[plantName];
+      if (!optimal) return '';
+
+      const currentValue = gh.conditions[conditionType];
+      const optimalValue = optimal[conditionType];
+      const diff = Math.abs(currentValue - optimalValue);
+
+      // Пороги для цветов
+      let thresholds = { temperature: 10, humidity: 20, light: 30 };
+      let threshold = thresholds[conditionType] || 15;
+
+      if (diff <= threshold * 0.3) return 'value-optimal';
+      if (diff <= threshold) return 'value-warning';
+      return 'value-critical';
+    };
+
     return {
       localGreenhouses,
       updateGhConditions,
@@ -214,7 +277,9 @@ export default {
       getPlantColor,
       showPlantModal,
       openPlantModal,
-      selectPlant
+      selectPlant,
+      setOptimalConditions,
+      getValueColor
     }
   }
 }
@@ -421,6 +486,38 @@ export default {
   .greenhouse {
     min-width: 160px;
   }
+}
+
+/* Стили для цветов значений параметров */
+.value-optimal {
+  color: #4CAF50; /* Зеленый */
+  font-weight: bold;
+}
+
+.value-warning {
+  color: #FF9800; /* Оранжевый */
+}
+
+.value-critical {
+  color: #f44336; /* Красный */
+  font-weight: bold;
+}
+
+/* Стили для кнопки оптимальных настроек */
+.optimal-btn {
+  margin-top: 10px;
+  padding: 8px 12px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  width: 100%;
+  transition: background-color 0.3s;
+}
+
+.optimal-btn:hover {
+  background-color: #3e8e41;
 }
 </style>
 

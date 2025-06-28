@@ -26,7 +26,7 @@ class Plant(ABC):
         self.optimal_temperature = 20.0
         self.optimal_humidity = 50.0
         self.optimal_light = 50.0
-        self.health_change_rate = 1.0  # Скорость изменения здоровья
+        self.health_change_rate = 0.0  # Скорость изменения здоровья
 
     def check_health(self, conditions: dict, time_elapsed: float):
         # Проверка отклонений от оптимальных условий с порогом ±30
