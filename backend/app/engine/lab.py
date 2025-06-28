@@ -95,8 +95,15 @@ class Lab:
                         'stage': gh.plant.stage.value,
                         'size': gh.plant.size,
                         'health': gh.plant.health,
-                        'flowering_percent': gh.plant.flowering_percent
-                    } if gh.plant else None  # Обработка пустой теплицы
+                        'flowering_percent': gh.plant.flowering_percent,
+                        'temperature_threshold': gh.plant.temperature_threshold,
+                        'humidity_threshold': gh.plant.humidity_threshold,
+                        'light_threshold': gh.plant.light_threshold,
+                        # Оптимальные значения
+                        'optimal_temperature': gh.plant.optimal_temperature,
+                        'optimal_humidity': gh.plant.optimal_humidity,
+                        'optimal_light': gh.plant.optimal_light
+                    } if gh.plant else None
                 } for gh in self.greenhouses.values()
             ]
         }

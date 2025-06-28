@@ -165,7 +165,7 @@ export default {
 
     const updateGhConditions = (ghId) => {
       const gh = localGreenhouses.value.find(g => g.id === ghId)
-      if (gh && gh.plant) {  // Только если есть растение
+      if (gh && gh.plant) {
         emit('update-conditions', ghId, {
           temperature: gh.conditions.temperature,
           humidity: gh.conditions.humidity,
@@ -195,12 +195,12 @@ export default {
       if (plant.health <= 0) return 'gray';
       if (plant.stage === 'Цветение') {
         switch(plant.name) {
-          case 'Гербера': return '#FF69B4';       // Розовый
-          case 'Орхидея': return '#DA70D6';       // Орхидейный
-          case 'Подсолнух': return '#FFD700';     // Золотой
-          case 'Венерина мухоловка': return '#FF0000'; // Красный
-          case 'Кактус Сагуаро': return '#FF69B4';    // Розовый
-          case 'Раффлезия': return '#8B0000';     // Темно-красный
+          case 'Гербера': return '#FF69B4';
+          case 'Орхидея': return '#DA70D6';
+          case 'Подсолнух': return '#FFD700';
+          case 'Венерина мухоловка': return '#FF0000';
+          case 'Кактус Сагуаро': return '#FF69B4';
+          case 'Раффлезия': return '#8B0000';
           default: return 'pink';
         }
       }
@@ -222,29 +222,14 @@ export default {
       showPlantModal.value = false
     }
 
-    // Карта оптимальных условий для каждого растения
-    const optimalConditionsMap = {
-      'Гербера': { temperature: 22, humidity: 60, light: 70 },
-      'Лиственница': { temperature: 18, humidity: 50, light: 60 },
-      'Кактус': { temperature: 30, humidity: 20, light: 90 },
-      'Орхидея': { temperature: 22, humidity: 80, light: 40 },
-      'Подсолнух': { temperature: 25, humidity: 50, light: 95 },
-      'Венерина мухоловка': { temperature: 25, humidity: 80, light: 50 },
-      'Кактус Сагуаро': { temperature: 35, humidity: 15, light: 95 },
-      'Раффлезия': { temperature: 28, humidity: 95, light: 5 }
-    };
-
     // Установка оптимальных условий
     const setOptimalConditions = (ghId) => {
       const gh = localGreenhouses.value.find(g => g.id === ghId);
       if (gh && gh.plant) {
-        const optimal = optimalConditionsMap[gh.plant.name];
-        if (optimal) {
-          gh.conditions.temperature = optimal.temperature;
-          gh.conditions.humidity = optimal.humidity;
-          gh.conditions.light = optimal.light;
-          updateGhConditions(ghId);
-        }
+        gh.conditions.temperature = gh.plant.optimal_temperature;
+        gh.conditions.humidity = gh.plant.optimal_humidity;
+        gh.conditions.light = gh.plant.optimal_light;
+        updateGhConditions(ghId);
       }
     };
 
@@ -252,17 +237,10 @@ export default {
     const getValueColor = (gh, conditionType) => {
       if (!gh.plant) return '';
 
-      const plantName = gh.plant.name;
-      const optimal = optimalConditionsMap[plantName];
-      if (!optimal) return '';
-
       const currentValue = gh.conditions[conditionType];
-      const optimalValue = optimal[conditionType];
+      const optimalValue = gh.plant[`optimal_${conditionType}`];
+      const threshold = gh.plant[`${conditionType}_threshold`];
       const diff = Math.abs(currentValue - optimalValue);
-
-      // Пороги для цветов
-      let thresholds = { temperature: 10, humidity: 20, light: 30 };
-      let threshold = thresholds[conditionType] || 15;
 
       if (diff <= threshold * 0.3) return 'value-optimal';
       if (diff <= threshold) return 'value-warning';

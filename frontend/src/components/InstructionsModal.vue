@@ -14,7 +14,7 @@
             <div class="plant-section">
               <div class="plant-header">
                 <h3>Гербера</h3>
-                <div class="plant-icon">🌼</div>
+                <div class="plant-icon">🌹</div>
               </div>
               <div class="plant-image">
                 <img src="@/assets/gerbera.png" alt="Гербера">
@@ -42,8 +42,8 @@
               </div>
               <ul>
                 <li><strong>Оптимальная среда:</strong></li>
-                <li>Температура: 18±10°C</li>
-                <li>Влажность: 50±20%</li>
+                <li>Температура: 18±30°C</li>
+                <li>Влажность: 50±30%</li>
                 <li>Освещение: 60±30%</li>
                 <li><strong>Всходы:</strong> стратификация (<5°C в течение 5 у.е.)</li>
                 <li><strong>Рост:</strong> около 4000 у.е.</li>

@@ -10,7 +10,7 @@ class LifeStage(Enum):
     GROWING = "Рост"
     MATURE = "Взрослое растение"
     FLOWERING = "Цветение"
-    DEAD = "Мертвое"  # Добавлена новая стадия
+    DEAD = "Мертвое"
 
 
 class Plant(ABC):
@@ -27,6 +27,10 @@ class Plant(ABC):
         self.optimal_humidity = 50.0
         self.optimal_light = 50.0
         self.health_change_rate = 0.0  # Скорость изменения здоровья
+        # Пороги по умолчанию
+        self.temperature_threshold = 10.0
+        self.humidity_threshold = 20.0
+        self.light_threshold = 30.0
 
     def check_health(self, conditions: dict, time_elapsed: float):
         # Проверка отклонений от оптимальных условий с порогом ±30
@@ -51,7 +55,7 @@ class Plant(ABC):
             self.health = 0.0
 
     def calculate_growth_modifier(self, conditions: dict):
-        """Рассчитывает модификатор роста на основе отклонения условий"""
+        # Рассчитывает модификатор роста на основе отклонения условий
         temp_diff = abs(conditions['temperature'] - self.optimal_temperature)
         humidity_diff = abs(conditions['humidity'] - self.optimal_humidity)
         light_diff = abs(conditions['light'] - self.optimal_light)
@@ -91,8 +95,11 @@ class Gerbera(Plant):
         self.optimal_temperature = 22.0
         self.optimal_humidity = 60.0
         self.optimal_light = 70.0
+        self.temperature_threshold = 10.0
+        self.humidity_threshold = 20.0
+        self.light_threshold = 30.0
         self.flowering_temp = 22.0
-        self.health_change_rate = 2.0  # Быстрее реагирует на изменения
+        self.health_change_rate = 2.0
 
     def update(self, conditions: dict, time_elapsed: float):
         # Проверяем здоровье перед обновлением
@@ -143,10 +150,13 @@ class Larch(Plant):
         self.optimal_temperature = 18.0
         self.optimal_humidity = 50.0
         self.optimal_light = 60.0
+        self.temperature_threshold = 30.0
+        self.humidity_threshold = 30.0
+        self.light_threshold = 30.0
         self.stratification_required = True
         self.stratified = False
         self.stratification_time = 0.0
-        self.health_change_rate = 0.5  # Медленнее реагирует на изменения
+        self.health_change_rate = 0.5
 
     def update(self, conditions: dict, time_elapsed: float):
         # Проверяем здоровье перед обновлением
@@ -198,8 +208,11 @@ class Cactus(Plant):
         self.optimal_temperature = 30.0
         self.optimal_humidity = 20.0
         self.optimal_light = 90.0
+        self.temperature_threshold = 10.0
+        self.humidity_threshold = 10.0
+        self.light_threshold = 10.0
         self.flowering_temp = 35.0
-        self.health_change_rate = 0.3  # Устойчив к изменениям
+        self.health_change_rate = 0.3
 
     def update(self, conditions: dict, time_elapsed: float):
         self.check_health(conditions, time_elapsed)
@@ -243,8 +256,11 @@ class Orchid(Plant):
         self.optimal_temperature = 22.0
         self.optimal_humidity = 80.0
         self.optimal_light = 40.0
+        self.temperature_threshold = 3.0
+        self.humidity_threshold = 10.0
+        self.light_threshold = 20.0
         self.flowering_temp = 20.0
-        self.health_change_rate = 1.5  # Чувствительна к изменениям
+        self.health_change_rate = 1.5
 
     def update(self, conditions: dict, time_elapsed: float):
         self.check_health(conditions, time_elapsed)
@@ -288,7 +304,11 @@ class Sunflower(Plant):
         self.optimal_temperature = 25.0
         self.optimal_humidity = 50.0
         self.optimal_light = 95.0
+        self.temperature_threshold = 5.0
+        self.humidity_threshold = 10.0
+        self.light_threshold = 5.0
         self.health_change_rate = 1.0
+
 
     def update(self, conditions: dict, time_elapsed: float):
         self.check_health(conditions, time_elapsed)
@@ -327,12 +347,15 @@ class Sunflower(Plant):
                 self.stage = LifeStage.FLOWERING
 
 
-class Flytrap(Plant):  # Венерина мухоловка
+class Flytrap(Plant):
     def __init__(self):
         super().__init__("Венерина мухоловка", growth_rate=0.7)
         self.optimal_temperature = 25.0
         self.optimal_humidity = 80.0
         self.optimal_light = 50.0
+        self.temperature_threshold = 5.0
+        self.humidity_threshold = 10.0
+        self.light_threshold = 20.0
         self.health_change_rate = 1.2
         self.flowering_temp = 25.0
 
@@ -381,12 +404,15 @@ class Flytrap(Plant):  # Венерина мухоловка
                 self.stage = LifeStage.FLOWERING
 
 
-class SaguaroCactus(Plant):  # Кактус Сагуаро
+class SaguaroCactus(Plant):
     def __init__(self):
         super().__init__("Кактус Сагуаро", growth_rate=0.08)
         self.optimal_temperature = 35.0
         self.optimal_humidity = 15.0
         self.optimal_light = 95.0
+        self.temperature_threshold = 5.0
+        self.humidity_threshold = 5.0
+        self.light_threshold = 5.0
         self.flowering_temp = 40.0
         self.health_change_rate = 0.3
 
@@ -435,15 +461,18 @@ class SaguaroCactus(Plant):  # Кактус Сагуаро
                 self.stage = LifeStage.FLOWERING
 
 
-class Rafflesia(Plant):  # Раффлезия
+class Rafflesia(Plant):
     def __init__(self):
         super().__init__("Раффлезия", growth_rate=1.7)
         self.optimal_temperature = 28.0
         self.optimal_humidity = 95.0
         self.optimal_light = 5.0
+        self.temperature_threshold = 2.0
+        self.humidity_threshold = 3.0
+        self.light_threshold = 5.0
         self.health_change_rate = 2.0
-        self.lifespan = 50.0  # Продолжительность жизни после цветения
-        self.mature_start_time = 0.0  # Время перехода в зрелую стадию
+        self.lifespan = 50.0
+        self.mature_start_time = 0.0
 
     def update(self, conditions: dict, time_elapsed: float):
         self.check_health(conditions, time_elapsed)
@@ -453,7 +482,6 @@ class Rafflesia(Plant):  # Раффлезия
         if self.stage == LifeStage.DEAD:
             return
 
-        # Специальные условия для всходов
         if self.stage == LifeStage.SEED:
             if conditions['light'] < 5 and conditions['humidity'] > 95:
                 self.stage = LifeStage.SPROUT
@@ -465,7 +493,6 @@ class Rafflesia(Plant):  # Раффлезия
             self.size += 0.1 * effective_time * growth_modifier
             if self.size >= 5.0:
                 self.stage = LifeStage.FLOWERING
-                # Сбрасываем таймер при переходе в цветение
                 self.flowering_percent = 0.0
 
         elif self.stage == LifeStage.FLOWERING:
@@ -477,19 +504,14 @@ class Rafflesia(Plant):  # Раффлезия
             if self.flowering_percent >= 100:
                 self.stage = LifeStage.MATURE
                 self.flowering_percent = 0.0
-                # Запоминаем время перехода в зрелую стадию
                 self.mature_start_time = self.time_without_flowering
 
         elif self.stage == LifeStage.MATURE:
-            # Увеличиваем общее время
             self.time_without_flowering += time_elapsed
 
-            # Рассчитываем время после созревания
             time_since_mature = self.time_without_flowering - self.mature_start_time
 
-            # Постепенно уменьшаем здоровье после созревания
             if time_since_mature > self.lifespan:
-                # Если превысили срок жизни - мгновенная смерть
                 self.health = 0
                 self.stage = LifeStage.DEAD
             else:
