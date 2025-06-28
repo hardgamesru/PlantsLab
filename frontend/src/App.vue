@@ -18,11 +18,6 @@
         <button @click="step">Шаг</button>
         <button @click="showInstructionsModal = true">Инструкция по выращиванию</button>
         <button @click="showLogModal = true">Показать лог</button>
-        <div class="time-control">
-          <label>Скорость времени:</label>
-          <input type="range" min="0.1" max="100" step="0.1" v-model="timeScale" @change="updateTimeScale">
-          <span>{{ timeScale }}x</span>
-        </div>
       </div>
     </div>
 
@@ -37,7 +32,28 @@
       @close="showInstructionsModal = false"
     />
 
-    <p class="virtual-time">Виртуальное время: {{ state.virtual_time.toFixed(1) }} у.е.</p>
+    <div class="time-bar">
+      <p class="virtual-time">Виртуальное время: {{ state.virtual_time.toFixed(1) }} у.е.</p>
+      <span>{{ timeScale }}x</span>
+      <div class="time-control-bar">
+        <div class="time-buttons-left">
+          <button @click="adjustTimeScale(-10)">-10</button>
+          <button @click="adjustTimeScale(-1)">-1</button>
+        </div>
+
+        <input type="range" min="0.1" max="100" step="0.1" v-model.number="timeScale" @change="updateTimeScale">
+
+        <div class="time-buttons-right">
+          <button @click="adjustTimeScale(1)">+1</button>
+          <button @click="adjustTimeScale(10)">+10</button>
+        </div>
+      </div>
+      <div class="time-presets">
+        <button @click="setTimeScale(1)">x1</button>
+        <button @click="setTimeScale(10)">x10</button>
+        <button @click="setTimeScale(100)">x100</button>
+      </div>
+    </div>
 
     <!-- Два ряда теплиц -->
     <div class="greenhouse-rows">
@@ -117,6 +133,16 @@ export default {
       await fetch(`http://localhost:8000/api/time_scale/${timeScale.value}`, { method: 'POST' })
     }
 
+    const setTimeScale = async (value) => {
+      timeScale.value = value
+      await updateTimeScale()
+    }
+
+    const adjustTimeScale = async (delta) => {
+      timeScale.value = Math.max(0.1, Math.min(100, parseFloat((timeScale.value + delta).toFixed(1))))
+      await updateTimeScale()
+    }
+
     const updateConditions = async (ghId, newConditions) => {
       await fetch(`http://localhost:8000/api/greenhouse/${ghId}/conditions`, {
         method: 'POST',
@@ -142,7 +168,9 @@ export default {
       updateTimeScale,
       updateConditions,
       setPlant,
-      removePlant
+      removePlant,
+      setTimeScale,
+      adjustTimeScale
     }
   }
 }
@@ -204,26 +232,109 @@ export default {
   background-color: #3a6bdd;
 }
 
-.time-control {
+.time-bar {
+  background-color: #e8f4f8;
+  padding: 12px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.virtual-time {
+  font-size: 1.2em;
+  font-weight: bold;
+  margin: 0 0 10px;
+}
+
+.time-control-bar {
   display: flex;
   align-items: center;
+  gap: 10px;
   width: 100%;
-  max-width: 250px;
-  margin-top: 10px;
+  max-width: 600px;
 }
 
-.time-control label {
-  margin-right: 10px;
-  font-size: 0.9em;
-}
-
-.time-control input {
+.time-control-bar input[type="range"] {
   flex: 1;
 }
 
-.time-control span {
-  margin-left: 10px;
-  min-width: 40px;
+.time-buttons-left, .time-buttons-right {
+  display: flex;
+  gap: 5px;
+}
+
+.time-buttons-left button,
+.time-buttons-right button {
+  padding: 5px 10px;
+  font-size: 0.9em;
+  background-color: #4a7bed;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.time-buttons-left button:hover,
+.time-buttons-right button:hover {
+  background-color: #3a6bdd;
+}
+
+.time-presets {
+  margin-top: 10px;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.time-presets button {
+  padding: 5px 10px;
+  font-size: 0.9em;
+  background-color: #4a7bed;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.time-presets button:hover {
+  background-color: #3a6bdd;
+}
+
+.time-presets span {
+  font-weight: bold;
+}
+
+.time-control-extended label {
+  margin-bottom: 5px;
+}
+
+.time-control-extended input {
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+.time-control-extended span {
+  margin-bottom: 10px;
+  font-weight: bold;
+}
+
+
+.time-buttons button {
+  padding: 5px 10px;
+  font-size: 0.9em;
+  background-color: #4a7bed;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.time-buttons button:hover {
+  background-color: #3a6bdd;
 }
 
 .greenhouse-rows {
@@ -237,14 +348,5 @@ export default {
   border-radius: 8px;
   padding: 15px;
   background-color: #f9f9f9;
-}
-
-.virtual-time {
-  font-size: 1.2em;
-  font-weight: bold;
-  margin: 10px 0 20px;
-  background-color: #e8f4f8;
-  padding: 8px;
-  border-radius: 4px;
 }
 </style>
