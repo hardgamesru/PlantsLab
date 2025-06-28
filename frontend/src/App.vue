@@ -70,6 +70,26 @@
              @remove-plant="removePlant"/>
       </div>
     </div>
+    <div class="encyclopedia-section">
+      <div class="encyclopedia-content">
+        <h2>Ботаническая энциклопедия растений</h2>
+        <p>Узнайте интересные факты о растениях, которые вы выращиваете в теплицах.
+        Наша энциклопедия содержит подробную информацию о происхождении, особенностях
+        и уникальных свойствах каждого растения.</p>
+        <button @click="showEncyclopediaModal = true">
+          <span>Открыть энциклопедию</span>
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M5 13h11.17l-4.88 4.88c-.39.39-.39 1.03 0 1.42.39.39 1.02.39 1.41 0l6.59-6.59a.996.996 0 0 0 0-1.41l-6.58-6.6a.996.996 0 1 0-1.41 1.41L16.17 11H5c-.55 0-1 .45-1 1s.45 1 1 1z"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Модальное окно энциклопедии -->
+    <EncyclopediaModal
+      :visible="showEncyclopediaModal"
+      @close="showEncyclopediaModal = false"
+    />
   </div>
 </template>
 
@@ -77,16 +97,18 @@
 import Map from './components/Map.vue'
 import LogModal from './components/LogModal.vue'
 import InstructionsModal from './components/InstructionsModal.vue'
+import EncyclopediaModal from './components/EncyclopediaModal.vue'
 import { ref, onMounted } from 'vue'
 
 export default {
-  components: { Map, LogModal, InstructionsModal },
+  components: { Map, LogModal, InstructionsModal, EncyclopediaModal },
   setup() {
     const state = ref({ greenhouses: [], virtual_time: 0 })
     const paused = ref(true)
     const timeScale = ref(1.0)
     const showLogModal = ref(false)
     const showInstructionsModal = ref(false)
+    const showEncyclopediaModal = ref(false)
 
     const setPlant = async (ghId, plantType) => {
       await fetch(`http://localhost:8000/api/greenhouse/${ghId}/plant/${plantType}`, {
@@ -170,7 +192,8 @@ export default {
       setPlant,
       removePlant,
       setTimeScale,
-      adjustTimeScale
+      adjustTimeScale,
+      showEncyclopediaModal
     }
   }
 }
@@ -348,5 +371,66 @@ export default {
   border-radius: 8px;
   padding: 15px;
   background-color: #f9f9f9;
+}
+
+.encyclopedia-section {
+  margin: 40px auto;
+  padding: 0;
+  background: linear-gradient(135deg, #1e5799 0%, #207cca 51%, #2989d8 100%);
+  border-radius: 15px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+}
+
+.encyclopedia-content {
+  padding: 40px 30px;
+  text-align: center;
+  color: white;
+}
+
+.encyclopedia-content h2 {
+  font-size: 2.2rem;
+  margin-bottom: 20px;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.encyclopedia-content p {
+  font-size: 1.2rem;
+  max-width: 800px;
+  margin: 0 auto 30px;
+  line-height: 1.7;
+  opacity: 0.9;
+}
+
+.encyclopedia-content button {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 35px;
+  background-color: white;
+  color: #1e5799;
+  border: none;
+  border-radius: 50px;
+  font-size: 1.3rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.encyclopedia-content button:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+  background-color: #f8f9fa;
+}
+
+.encyclopedia-content button svg {
+  width: 24px;
+  height: 24px;
+  transition: transform 0.3s ease;
+}
+
+.encyclopedia-content button:hover svg {
+  transform: translateX(5px);
 }
 </style>
