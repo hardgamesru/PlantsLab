@@ -1,7 +1,20 @@
 from .logentry import LogEventType
 from .plant import Gerbera, Larch, Cactus, Orchid, Sunflower, Flytrap, SaguaroCactus, Rafflesia
 
+
 class Greenhouse:
+    # Словарь классов растений
+    PLANT_CLASSES = {
+        "gerbera": Gerbera,
+        "larch": Larch,
+        "cactus": Cactus,
+        "orchid": Orchid,
+        "sunflower": Sunflower,
+        "flytrap": Flytrap,
+        "saguaro": SaguaroCactus,
+        "rafflesia": Rafflesia
+    }
+
     def __init__(self, id: int):
         self.id = id
         self.conditions = {
@@ -20,25 +33,19 @@ class Greenhouse:
     }
 
     def set_plant(self, plant_type: str):
-        if plant_type == "gerbera":
-            self.plant = Gerbera()
-        elif plant_type == "larch":
-            self.plant = Larch()
-        elif plant_type == "cactus":
-            self.plant = Cactus()
-        elif plant_type == "orchid":
-            self.plant = Orchid()
-        elif plant_type == "sunflower":
-            self.plant = Sunflower()
-        elif plant_type == "flytrap":
-            self.plant = Flytrap()
-        elif plant_type == "saguaro":
-            self.plant = SaguaroCactus()
-        elif plant_type == "rafflesia":
-            self.plant = Rafflesia()
+        # Получаем класс растения из словаря
+        plant_class = self.PLANT_CLASSES.get(plant_type)
+        if not plant_class:
+            return None  # Неизвестный тип растения
+
+        # Создаем экземпляр растения
+        self.plant = plant_class()
+
+        # Используем имя растения из созданного экземпляра
+        plant_name = self.plant.name
 
         # Записываем событие посадки
-        return LogEventType.PLANT_ADDED, f"Посажено растение: {plant_type}"
+        return LogEventType.PLANT_ADDED, f"Посажено растение: {plant_name}"
 
     def remove_plant(self):
         plant_name = self.plant.name if self.plant else "Неизвестное растение"
