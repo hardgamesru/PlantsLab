@@ -138,7 +138,7 @@ export default {
 
 .modal-header {
   padding: 20px;
-  background-color: #2c3e50;
+  background: linear-gradient(to right, #1e5799, #207cca);
   color: white;
   display: flex;
   justify-content: space-between;
@@ -154,11 +154,20 @@ export default {
 .close-btn {
   background: none;
   border: none;
-  font-size: 2em;
   cursor: pointer;
+  font-size: 2em;
   color: white;
   padding: 5px;
-  line-height: 1;
+  transition: all 0.3s ease;
+}
+
+.close-btn:hover {
+  transform: scale(1.1);
+}
+
+.close-btn svg {
+  width: 24px;
+  height: 24px;
 }
 
 .modal-content {
@@ -189,7 +198,7 @@ export default {
   margin-top: 0;
   margin-bottom: 15px;
   font-size: 1.5em;
-  border-left: 5px solid #4CAF50;
+  border-left: 5px solid #207cca;
   padding-left: 15px;
 }
 
@@ -215,7 +224,7 @@ export default {
 }
 
 .modal-content::-webkit-scrollbar-thumb {
-  background: #4CAF50;
+  background: #207cca;
   border-radius: 10px;
 }
 

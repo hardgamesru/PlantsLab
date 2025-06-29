@@ -13,11 +13,37 @@
       </div>
 
       <div class="simulation-controls">
-        <button @click="resetSystem">Перезапустить систему</button>
-        <button @click="togglePause">{{ paused ? 'Старт' : 'Пауза' }}</button>
-        <button @click="step">Шаг</button>
-        <button @click="showInstructionsModal = true">Инструкция по выращиванию</button>
-        <button @click="showLogModal = true">Показать лог</button>
+        <button @click="resetSystem">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/>
+          </svg>
+          Перезапустить
+        </button>
+        <button @click="togglePause">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+            <path v-if="paused" d="M8 5v14l11-7z"/>
+            <path v-else d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
+          </svg>
+          {{ paused ? 'Старт' : 'Пауза' }}
+        </button>
+        <button @click="step">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M5 4v16h16V4H5zm2 2h12v12H7V6zm3 4v4h2v-4h-2zm4 0v4h2v-4h-2z"/>
+          </svg>
+          Шаг
+        </button>
+        <button @click="showInstructionsModal = true">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M11 7h2v2h-2zm0 4h2v6h-2zm1-9C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/>
+          </svg>
+          Инструкция
+        </button>
+        <button @click="showLogModal = true">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H5.17l-.59.59-.58.58V4h16v12zM6 12h12v2H6zm0-3h12v2H6zm0-3h12v2H6z"/>
+          </svg>
+          Показать лог
+        </button>
       </div>
     </div>
 
@@ -201,33 +227,52 @@ export default {
 
 <style>
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   text-align: center;
-  color: #2c3e50;
-  margin-top: 20px;
-  padding: 0 20px;
+  color: white;
+  padding: 20px;
+  background: linear-gradient(135deg, #1e5799 0%, #207cca 51%, #2989d8 100%);
+  min-height: 100vh;
+  background-attachment: fixed;
+}
+
+h1 {
+  font-size: 2.8rem;
+  margin: 0 0 25px;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  color: #fff;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 15px;
+  border-radius: 15px;
+  display: inline-block;
 }
 
 .instructions {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 20px;
+  margin-bottom: 30px;
   flex-wrap: wrap;
-  background-color: #f5f7fa;
-  padding: 15px;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  background: rgba(255, 255, 255, 0.9);
+  padding: 20px;
+  border-radius: 15px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
 }
 
 .quick-guide {
   text-align: left;
   flex: 2;
   min-width: 300px;
-  font-size: 20px;
+  font-size: 18px;
+  color: #2c3e50;
 }
 
 .quick-guide h2 {
   margin-top: 0;
+  color: #1e5799;
+  font-size: 1.8rem;
+  border-bottom: 2px solid #4a7bed;
+  padding-bottom: 8px;
+  margin-bottom: 15px;
 }
 
 .simulation-controls {
@@ -239,36 +284,53 @@ export default {
 }
 
 .simulation-controls button {
-  margin-bottom: 10px;
-  padding: 8px 15px;
+  margin-bottom: 12px;
+  padding: 12px 20px;
   width: 100%;
   max-width: 250px;
-  background-color: #4a7bed;
+  background: linear-gradient(to right, #4a7bed, #3a6bdd);
   color: white;
   border: none;
-  border-radius: 4px;
+  border-radius: 50px;
   cursor: pointer;
-  font-size: 1em;
+  font-size: 1.1em;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  transition: all 0.3s ease;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
 }
 
 .simulation-controls button:hover {
-  background-color: #3a6bdd;
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+  background: linear-gradient(to right, #3a6bdd, #2a5bcd);
+}
+
+.simulation-controls button svg {
+  width: 20px;
+  height: 20px;
 }
 
 .time-bar {
-  background-color: #e8f4f8;
-  padding: 12px;
-  border-radius: 8px;
-  margin-bottom: 20px;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 20px;
+  border-radius: 15px;
+  margin-bottom: 30px;
   display: flex;
   flex-direction: column;
   align-items: center;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  color: #2c3e50;
 }
 
 .virtual-time {
-  font-size: 1.2em;
+  font-size: 1.3em;
   font-weight: bold;
-  margin: 0 0 10px;
+  margin: 0 0 15px;
+  color: #1e5799;
 }
 
 .time-control-bar {
@@ -277,10 +339,27 @@ export default {
   gap: 10px;
   width: 100%;
   max-width: 600px;
+  margin-bottom: 15px;
 }
 
 .time-control-bar input[type="range"] {
   flex: 1;
+  height: 10px;
+  -webkit-appearance: none;
+  background: linear-gradient(to right, #4a7bed, #3a6bdd);
+  border-radius: 5px;
+  outline: none;
+}
+
+.time-control-bar input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+  background: white;
+  border: 3px solid #4a7bed;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
 .time-buttons-left, .time-buttons-right {
@@ -290,74 +369,49 @@ export default {
 
 .time-buttons-left button,
 .time-buttons-right button {
-  padding: 5px 10px;
-  font-size: 0.9em;
-  background-color: #4a7bed;
+  padding: 8px 15px;
+  font-size: 1em;
+  background: linear-gradient(to right, #4a7bed, #3a6bdd);
   color: white;
   border: none;
-  border-radius: 4px;
+  border-radius: 8px;
   cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s ease;
 }
 
 .time-buttons-left button:hover,
 .time-buttons-right button:hover {
-  background-color: #3a6bdd;
+  transform: translateY(-3px);
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
 }
 
 .time-presets {
-  margin-top: 10px;
   display: flex;
-  gap: 10px;
+  gap: 15px;
   align-items: center;
   flex-wrap: wrap;
   justify-content: center;
 }
 
 .time-presets button {
-  padding: 5px 10px;
-  font-size: 0.9em;
-  background-color: #4a7bed;
-  color: white;
-  border: none;
-  border-radius: 4px;
+  padding: 8px 20px;
+  font-size: 1em;
+  background: rgba(255, 255, 255, 0.9);
+  color: #1e5799;
+  border: 2px solid #4a7bed;
+  border-radius: 50px;
   cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
 }
 
 .time-presets button:hover {
-  background-color: #3a6bdd;
-}
-
-.time-presets span {
-  font-weight: bold;
-}
-
-.time-control-extended label {
-  margin-bottom: 5px;
-}
-
-.time-control-extended input {
-  width: 100%;
-  margin-bottom: 10px;
-}
-
-.time-control-extended span {
-  margin-bottom: 10px;
-  font-weight: bold;
-}
-
-
-.time-buttons button {
-  padding: 5px 10px;
-  font-size: 0.9em;
-  background-color: #4a7bed;
+  background: #4a7bed;
   color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-.time-buttons button:hover {
-  background-color: #3a6bdd;
+  transform: translateY(-3px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
 }
 
 .greenhouse-rows {
@@ -367,18 +421,18 @@ export default {
 }
 
 .greenhouse-row {
-  border: 1px solid #e0e0e0;
-  border-radius: 8px;
-  padding: 15px;
-  background-color: #f9f9f9;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 15px;
+  padding: 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
 }
 
 .encyclopedia-section {
   margin: 40px auto;
   padding: 0;
-  background: linear-gradient(135deg, #1e5799 0%, #207cca 51%, #2989d8 100%);
+  background: linear-gradient(135deg, rgba(30, 87, 153, 0.9) 0%, rgba(32, 124, 202, 0.9) 51%, rgba(41, 137, 216, 0.9) 100%);
   border-radius: 15px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
   overflow: hidden;
 }
 
@@ -433,4 +487,5 @@ export default {
 .encyclopedia-content button:hover svg {
   transform: translateX(5px);
 }
+
 </style>

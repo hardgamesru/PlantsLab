@@ -231,11 +231,12 @@ export default {
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  color: #2c3e50;
 }
 
 .modal-header {
   padding: 20px;
-  background-color: #2c3e50;
+  background: linear-gradient(to right, #1e5799, #207cca);
   color: white;
   display: flex;
   justify-content: space-between;
@@ -250,12 +251,22 @@ export default {
 .close-btn {
   background: none;
   border: none;
-  font-size: 1.8em;
   cursor: pointer;
+  font-size: 2em;
   color: white;
   padding: 5px;
-  line-height: 1;
+  transition: all 0.3s ease;
 }
+
+.close-btn:hover {
+  transform: scale(1.1);
+}
+
+.close-btn svg {
+  width: 24px;
+  height: 24px;
+}
+
 .modal-header button {
   background: none;
   color: white;
@@ -263,11 +274,6 @@ export default {
   border-radius: 4px;
   padding: 8px 15px;
   cursor: pointer;
-  transition: background-color 0.2s;
-}
-
-.modal-header button:hover {
-  background-color: #3a6bdd;
 }
 
 .modal-content {
