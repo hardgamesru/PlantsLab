@@ -28,15 +28,14 @@ class Plant(ABC):
         self.optimal_light = 50.0
         self.health_change_rate = 0.0  # Скорость изменения здоровья
         # Пороги по умолчанию
-        self.temperature_threshold = 10.0
+        self.temperature_threshold = 0
         self.humidity_threshold = 20.0
         self.light_threshold = 30.0
 
     def check_health(self, conditions: dict, time_elapsed: float):
-        # Проверка отклонений от оптимальных условий с порогом ±30
-        temp_diff = max(0, abs(conditions['temperature'] - self.optimal_temperature) - 10)
-        humidity_diff = max(0, abs(conditions['humidity'] - self.optimal_humidity) - 20)
-        light_diff = max(0, abs(conditions['light'] - self.optimal_light) - 30)
+        temp_diff = max(0, abs(conditions['temperature'] - self.optimal_temperature) - self.temperature_threshold)
+        humidity_diff = max(0, abs(conditions['humidity'] - self.optimal_humidity) - self.humidity_threshold)
+        light_diff = max(0, abs(conditions['light'] - self.optimal_light) - self.light_threshold)
 
         # Суммарное отклонение (только за пределами порога)
         total_diff = temp_diff + humidity_diff + light_diff
